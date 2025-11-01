@@ -43,7 +43,7 @@ const CurrentSchema = z.object({
     )
     .optional(),
 }); // 追記
-const MaxPopSchema = z.number().min(0).max(1); // 追記
+const MaxPopSchema = z.number().min(0).max(1).nullable().optional();
 
 export default function Today() {
   const [state, setState] = useState<State>({ loading: true });

@@ -35,7 +35,7 @@ export default function OutfitSimple({
   // 画像が渡されていなければ絵文字で代用
   const emoji: Record<string, string> = {
     coat: "🧥",
-    long: "👕",
+    long: "🧥",
     light: "👕",
     short: "👚",
   };
