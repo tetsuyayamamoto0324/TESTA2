@@ -5,8 +5,8 @@ import { z } from "zod";
 import { Alert, Title } from "@mantine/core";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../../store/auth";
-import { useError } from "@/contexts/ErrorContext"; // 修正: 追加
-import { normalizeError, messageFor } from "@/lib/appError"; // 修正: 追加
+import { useError } from "@/contexts/ErrorContext";
+import { normalizeError, messageFor } from "@/lib/appError";
 
 const schema = z.object({
   email: z.string().min(1, "メールは必須です").email("メール形式が不正です"),
@@ -16,7 +16,7 @@ const schema = z.object({
 export default function Signup() {
   const navigate = useNavigate();
   const { setUser } = useAuth();
-  const showError = useError(); // 修正: 追加
+  const showError = useError();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -27,23 +27,6 @@ export default function Signup() {
 
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  const linkBtnStyle: React.CSSProperties = {
-    display: "block",
-    width: "100%",
-    background: "transparent",
-    border: "none",
-    padding: "8px 0",
-    cursor: "pointer",
-    textDecoration: "none",
-  };
-  const linkLabelStyle: React.CSSProperties = {
-    display: "block",
-    textAlign: "center",
-    fontSize: 28,
-    fontWeight: 700,
-    color: "#1f6fff",
-  };
 
   const onChangeEmail = (e: React.ChangeEvent<HTMLInputElement>) => {
     const v = e.target.value;
@@ -69,18 +52,11 @@ export default function Signup() {
 
     const parsed = schema.safeParse({ email, password });
     if (!parsed.success) {
-  const fe = parsed.error.flatten().fieldErrors;
-  setEmailErr(fe.email?.[0] ?? null);
-  setPasswordErr(fe.password?.[0] ?? null);
-
-  // ▼ この showError は図のフローでは不要なので削除 or コメントアウト
-  // showError(new Error(fe.email?.[0] ?? fe.password?.[0] ?? "入力が不正です"), {
-  //   title: "入力が正しくありません",
-  //   fallbackMessage: "入力の形式が正しくありません。内容をご確認ください。",
-  // });
-
-  return;
-}
+      const fe = parsed.error.flatten().fieldErrors;
+      setEmailErr(fe.email?.[0] ?? null);
+      setPasswordErr(fe.password?.[0] ?? null);
+      return;
+    }
     setEmailErr(null);
     setPasswordErr(null);
 
@@ -91,10 +67,10 @@ export default function Signup() {
         password,
       });
       if (signUpError) {
-        const appErr = normalizeError(signUpError); // 修正
+        const appErr = normalizeError(signUpError);
         showError(appErr, {
-          title: "このメールアドレスは登録済です。", // 修正
-          fallbackMessage: messageFor(appErr.kind, appErr.message), // 修正
+          title: "このメールアドレスは登録済です。",
+          fallbackMessage: messageFor(appErr.kind, appErr.message),
         });
         setError(signUpError.message);
         return;
@@ -110,10 +86,10 @@ export default function Signup() {
         await supabase.auth.signInWithPassword({ email, password });
 
       if (signInError) {
-        const appErr = normalizeError(signInError); // 修正
+        const appErr = normalizeError(signInError);
         showError(appErr, {
-          title: "ログインに失敗しました", // 修正
-          fallbackMessage: messageFor(appErr.kind, appErr.message), // 修正
+          title: "ログインに失敗しました",
+          fallbackMessage: messageFor(appErr.kind, appErr.message),
         });
         setError(signInError.message);
         return;
@@ -126,13 +102,13 @@ export default function Signup() {
 
       setError("サインアップは成功しましたが、ログインできませんでした。");
       showError(new Error("サインアップは成功しましたが、ログインできませんでした。"), {
-        title: "ログインできませんでした", // 修正
-      }); // 修正
+        title: "ログインできませんでした",
+      });
     } catch (e: any) {
-      const appErr = normalizeError(e); // 修正
+      const appErr = normalizeError(e);
       showError(appErr, {
-        title: "このメールアドレスは登録済です。", // 修正
-        fallbackMessage: messageFor(appErr.kind, appErr.message), // 修正
+        title: "このメールアドレスは登録済です。",
+        fallbackMessage: messageFor(appErr.kind, appErr.message),
       });
       setError(appErr.message);
     } finally {
@@ -141,50 +117,24 @@ export default function Signup() {
   }
 
   return (
-    <div
-      style={{
-        position: "fixed",
-        inset: 0,
-        background: "#E6F7FF",
-        display: "grid",
-        placeItems: "center",
-        padding: 16,
-      }}
-    >
-      <div style={{ width: "100%", maxWidth: 520 }}>
-        <Title order={2} style={{ textAlign: "center", fontWeight: 700, marginBottom: 28 }}>
+    <div className="authPage">
+      <div className="authContainer">
+        <Title order={2} ta="center" fw={700} mb={28}>
           新規登録
         </Title>
-        <Title
-          order={5}
-          style={{
-            textAlign: "center",
-            color: "var(--mantine-color-dimmed)",
-            fontWeight: 600,
-            marginBottom: 20,
-          }}
-        >
+        <Title order={5} ta="center" c="dimmed" fw={600} mb={20}>
           メールアドレスで登録
         </Title>
 
         {error && (
-          <Alert color="red" style={{ maxWidth: 520, margin: "0 auto 12px" }}>
+          <Alert color="red" className="errorAlert">
             {error}
           </Alert>
         )}
 
-        <form onSubmit={handleSubmit} style={{ maxWidth: 520, margin: "0 auto" }}>
+        <form onSubmit={handleSubmit} className="form">
           {/* メール */}
-          <div
-            style={{
-              background: "#fff",
-              border: "1px solid #000",
-              boxShadow: "0 4px 8px rgba(0,0,0,0.25)",
-              padding: "10px 14px",
-              width: "100%",
-              marginTop: 18,
-            }}
-          >
+          <div className="field">
             <input
               type="email"
               name="email"
@@ -194,30 +144,13 @@ export default function Signup() {
               value={email}
               onChange={onChangeEmail}
               required
-              style={{
-                width: "100%",
-                border: "none",
-                outline: "none",
-                background: "transparent",
-                fontSize: 16,
-              }}
+              className="input"
             />
           </div>
-          {emailErr && (
-            <div style={{ color: "#e03131", fontSize: 13, marginTop: 6 }}>{emailErr}</div>
-          )}
+          {emailErr && <div className="fieldError">{emailErr}</div>}
 
           {/* パスワード */}
-          <div
-            style={{
-              background: "#fff",
-              border: "1px solid #000",
-              boxShadow: "0 4px 8px rgba(0,0,0,0.25)",
-              padding: "10px 14px",
-              width: "100%",
-              marginTop: 24,
-            }}
-          >
+          <div className="field">
             <input
               type="password"
               name="password"
@@ -227,37 +160,25 @@ export default function Signup() {
               value={password}
               onChange={onChangePassword}
               required
-              style={{
-                width: "100%",
-                border: "none",
-                outline: "none",
-                background: "透明",
-                fontSize: 16,
-              }}
+              className="input"
             />
           </div>
-          {passwordErr && (
-            <div style={{ color: "#e03131", fontSize: 13, marginTop: 6 }}>{passwordErr}</div>
-          )}
+          {passwordErr && <div className="fieldError">{passwordErr}</div>}
 
           {/* 送信ボタン */}
           <button
             type="submit"
             disabled={submitting}
-            style={{
-              ...linkBtnStyle,
-              marginTop: 16,
-              opacity: submitting ? 0.5 : 1,
-              pointerEvents: submitting ? "none" : "auto",
-            }}
+            className={`submitBtn${submitting ? " isSubmitting" : ""}`}
+            aria-disabled={submitting}
           >
-            <span style={linkLabelStyle}>新規登録</span>
+            <span className="submitLabel">新規登録</span>
           </button>
         </form>
 
-        <div style={{ marginTop: 28 }}>
-          <Link to="/login" style={linkBtnStyle}>
-            <span style={linkLabelStyle}>ログインへ</span>
+        <div className="linkWrap">
+          <Link to="/login" className="linkBtn">
+            <span className="linkLabel">ログインへ</span>
           </Link>
         </div>
       </div>

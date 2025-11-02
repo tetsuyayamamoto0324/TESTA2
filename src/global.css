@@ -1,0 +1,15 @@
+/* src/global.css */
+*,
+*::before,
+*::after { box-sizing: border-box; }
+
+html, body, #root { height: 100%; }
+
+body {
+  margin: 0;                /* ← これが最重要（白い帯と余計なスクロールの原因） */
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* スクロール挙動を落ち着かせたい場合は任意で */
+html, body { overscroll-behavior: contain; }

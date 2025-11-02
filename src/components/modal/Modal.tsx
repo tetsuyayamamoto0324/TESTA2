@@ -5,14 +5,14 @@ type Props = {
   open: boolean;
   onClose: () => void;
   title?: string;
-  width?: number; // ダイアログの幅(px)。未指定なら 460
+  width?: number; // 将来CSS Modules側で使う想定（現状は未使用）
   children: React.ReactNode;
 };
 
 export default function Modal({ open, onClose, title, width = 460, children }: Props) {
   const firstFocusRef = useRef<HTMLDivElement>(null);
 
-  // ESC で閉じる / オープン中は背景スクロールを止める
+  // ESCで閉じる／オープン中は背景スクロール停止／フォーカス移動
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => {
@@ -21,7 +21,6 @@ export default function Modal({ open, onClose, title, width = 460, children }: P
     document.addEventListener("keydown", onKey);
     const prev = document.body.style.overflow;
     document.body.style.overflow = "hidden";
-    // ざっくりフォーカスをモーダル内へ
     setTimeout(() => firstFocusRef.current?.focus(), 0);
     return () => {
       document.removeEventListener("keydown", onKey);
@@ -31,57 +30,36 @@ export default function Modal({ open, onClose, title, width = 460, children }: P
 
   if (!open) return null;
 
-  const overlay: React.CSSProperties = {
-    position: "fixed",
-    inset: 0,
-    background: "rgba(0,0,0,.35)",
-    backdropFilter: "blur(1px)",
-    display: "grid",
-    placeItems: "center",
-    zIndex: 1000,
-  };
-  const dialog: React.CSSProperties = {
-    width,
-    maxWidth: "92vw",
-    background: "#fff",
-    borderRadius: 12,
-    boxShadow: "0 12px 36px rgba(0,0,0,.25)",
-    padding: "18px 18px 16px",
-    border: "1px solid rgba(0,0,0,.15)",
-  };
-  const header: React.CSSProperties = {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-    gap: 12,
-    marginBottom: 12,
-  };
-  const titleStyle: React.CSSProperties = { fontSize: 18, fontWeight: 800 };
-  const closeBtn: React.CSSProperties = {
-    border: "1px solid rgba(0,0,0,.25)",
-    borderRadius: 8,
-    padding: "6px 10px",
-    background: "#f6f9ff",
-    cursor: "pointer",
-  };
-
   return (
-    <div style={overlay} role="presentation" onClick={onClose}>
+    // 見た目のスタイルは当てない。classNameは将来のCSS Modules用フック。
+    <div
+      role="presentation"
+      className="overlay"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+    >
       <div
-        style={dialog}
         role="dialog"
         aria-modal="true"
-        aria-label={title || "モーダル"}
-        onClick={(e) => e.stopPropagation()} // 中身クリックで閉じない
+        aria-labelledby="modal-title"
+        className="dialog"
+        onClick={(e) => e.stopPropagation()}
       >
         <div ref={firstFocusRef} tabIndex={-1} />
-        <div style={header}>
-          {title ? <div style={titleStyle}>{title}</div> : <div />}
-          <button type="button" style={closeBtn} onClick={onClose} aria-label="閉じる">
+        <div className="header">
+          {title ? (
+            <div id="modal-title" className="title">
+              {title}
+            </div>
+          ) : (
+            <div />
+          )}
+          <button type="button" onClick={onClose} aria-label="閉じる" className="close">
             ×
           </button>
         </div>
-        {children}
+        <div className="body">{children}</div>
       </div>
     </div>
   );

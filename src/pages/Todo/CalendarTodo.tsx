@@ -1,12 +1,10 @@
 // src/pages/Calendar/CalendarTodo.tsx
 import React from "react";
 import TodoModal from "@/components/modal/TodoModal";
-import { AppError } from "@/lib/appError";
 import { z } from "zod";
 import { supabase } from "@/lib/supabase";
 import { useError } from "@/contexts/ErrorContext";
 import { useAuth } from "@/store/auth";
-import s from "./CalendarTodo.module.css"; // ← 追加
 
 const REMOTE_TODO_ENABLED = import.meta.env.VITE_TODO_REMOTE === "1";
 const ERROR_MODAL_ENABLED = import.meta.env.VITE_TODO_ERROR_MODAL === "1";
@@ -25,19 +23,6 @@ const clip = (text: string, max: number) => {
 const LS_KEY = "todo-cal-v1";
 const LONG_LINE_MAX = 10;
 const ITEM_LINE_MAX = 10;
-
-/** 位置と幅（必要に応じて変更） */
-const CAL_SHIFT_X = 290;
-const CAL_SHIFT_Y = 30;
-const BOX_W = 840;
-const TITLE_SHIFT_X = 440;
-const TITLE_SHIFT_Y = -10;
-const WEEK_SHIFT_X = 10;
-const WEEK_SHIFT_Y = -6;
-const ARROW_SIZE = 60;
-const SIDE_MONTH_SIZE = 30;
-const CENTER_YM_SIZE = 40;
-const CENTER_YM_WEIGHT = 900;
 
 const ymd = (d: Date) =>
   `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(
@@ -256,52 +241,22 @@ export default function CalendarTodo() {
     return `${m.getMonth() + 1}月`;
   })();
 
-  // demo API など（省略）…
-  const NewTodo = z.object({ title: z.string().min(1).max(200), date: z.string() });
-
   return (
     <>
-      <div className={s.wrap}>
-        <div
-          className={s.shift}
-          style={
-            {
-              "--cal-shift-x": `${CAL_SHIFT_X}px`,
-              "--cal-shift-y": `${CAL_SHIFT_Y}px`,
-            } as React.CSSProperties
-          }
-        >
-          <div className={s.box} style={{ "--box-w": `${BOX_W}px` } as React.CSSProperties}>
-            <div
-              className={s.title}
-              style={
-                {
-                  "--title-shift-x": `${TITLE_SHIFT_X}px`,
-                  "--title-shift-y": `${TITLE_SHIFT_Y}px`,
-                } as React.CSSProperties
-              }
-            >
-              ToDoカレンダー
-            </div>
+      <div className="wrap">
+        <div className="shift">
+          <div className="box">
+            <div className="title">ToDoカレンダー</div>
 
             {/* 曜日ヘッダ */}
-            <div
-              className={s.weekHead}
-              style={
-                {
-                    "--week-width": "295%",
-                    "--week-shift-x": `${WEEK_SHIFT_X}px`,
-                    "--week-shift-y": `${WEEK_SHIFT_Y}px`,
-                } as React.CSSProperties
-              }
-            >
+            <div className="weekHead">
               {week.map((w) => (
-                <div key={w} className={s.weekCell}>{w}</div>
+                <div key={w} className="weekCell">{w}</div>
               ))}
             </div>
 
             {/* 本体グリッド（7×6） */}
-            <div className={s.grid} style={{ "--grid-width": "300%" } as React.CSSProperties}>
+            <div className="grid">
               {cells.map(({ date, inMonth }) => {
                 const key = ymd(date);
                 const list = todos[key] ?? [];
@@ -313,26 +268,26 @@ export default function CalendarTodo() {
                 return (
                   <div
                     key={key}
-                    className={`${s.cell} ${inMonth ? "" : s.outCell}`}
+                    className={`cell${inMonth ? "" : " outCell"}`}
                     onClick={() => editDay(date)}
                     title="クリックでこの日のToDoを編集"
                   >
-                    <div className={s.dateNum}>{date.getDate()}</div>
+                    <div className="dateNum">{date.getDate()}</div>
 
                     {list.length > 0 &&
                       (isLong ? (
-                        <div className={s.todoOneLineCenter} title={first}>
+                        <div className="todoOneLineCenter" title={first}>
                           {clip(first, LONG_LINE_MAX)}
                         </div>
                       ) : (
-                        <div className={s.todoList}>
+                        <div className="todoList">
                           {list.slice(0, 3).map((t, i) => (
-                            <div key={i} className={s.todoItem} title={t}>
+                            <div key={i} className="todoItem" title={t}>
                               {clip(t, ITEM_LINE_MAX)}
                             </div>
                           ))}
                           {list.length > 3 && (
-                            <div className={s.todoItem} style={{ opacity: 0.6 }}>
+                            <div className="todoItem more">
                               +{list.length - 3} more
                             </div>
                           )}
@@ -344,35 +299,19 @@ export default function CalendarTodo() {
             </div>
 
             {/* 下部ナビゲーション */}
-            <div
-              className={s.navRow}
-              style={
-                {
-                  "--side-month-size": `${SIDE_MONTH_SIZE}px`,
-                  "--arrow-size": `${ARROW_SIZE}px`,
-                  "--center-ym-size": `${CENTER_YM_SIZE}px`,
-                  "--center-ym-weight": CENTER_YM_WEIGHT,
-                  "--nav-prev-x": "250px",
-                  "--nav-prev-y": "8px",
-                  "--nav-center-x": "430px",
-                  "--nav-center-y": "-6px",
-                  "--nav-next-x": "600px",
-                  "--nav-next-y": "8px",
-                } as React.CSSProperties
-              }
-            >
-              <div className={`${s.navBtn} ${s.navPrevOffset}`} onClick={prev}>
-                <div className={s.navTxt}>{prevMonthText}</div>
-                <div className={s.arrow} aria-hidden>←</div>
+            <div className="navRow">
+              <div className="navBtn navPrevOffset" onClick={prev}>
+                <div className="navTxt">{prevMonthText}</div>
+                <div className="arrow" aria-hidden>←</div>
               </div>
 
-              <div className={`${s.centerYM} ${s.navCenterOffset}`}>
+              <div className="centerYM navCenterOffset">
                 {viewYear} / {titleMonth}
               </div>
 
-              <div className={`${s.navBtn} ${s.navNextOffset}`} onClick={next}>
-                <div className={s.navTxt}>{nextMonthText}</div>
-                <div className={s.arrow} aria-hidden>→</div>
+              <div className="navBtn navNextOffset" onClick={next}>
+                <div className="navTxt">{nextMonthText}</div>
+                <div className="arrow" aria-hidden>→</div>
               </div>
             </div>
           </div>

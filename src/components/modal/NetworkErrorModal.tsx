@@ -1,77 +1,44 @@
 // src/components/NetworkErrorModal.tsx
 import React from "react";
+import { createPortal } from "react-dom";
 
 type Props = {
   open: boolean;
-  // onClose?: () => void; // 修正: 閉じる操作を廃止するため未使用に
+  // 閉じる操作は提供しない（オンライン復旧で自動的に非表示にする想定）
 };
 
-export default function NetworkErrorModal({ open }: Props) { // 修正
+export default function NetworkErrorModal({ open }: Props) {
   if (!open) return null;
 
-  const styles: Record<string, React.CSSProperties> = {
-    overlay: {
-      position: "fixed",
-      inset: 0,
-      background: "rgba(0,0,0,.22)",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      zIndex: 6000,
-    },
-    modal: {
-      position: "relative",
-      width: 440,
-      background: "#fff",
-      borderRadius: 12,
-      boxShadow: "0 8px 24px rgba(0,0,0,.18)",
-      padding: 16,
-    },
-    head: { display: "flex", alignItems: "center", gap: 10, marginBottom: 8 },
-    badge: {
-      width: 20,
-      height: 20,
-      borderRadius: 9999,
-      background: "#495057",
-      color: "#fff",
-      display: "grid",
-      placeItems: "center",
-      fontSize: 12,
-      fontWeight: 900,
-      lineHeight: 1,
-    },
-    title: { fontWeight: 900, fontSize: 16 },
-    msg: { fontSize: 14, lineHeight: 1.6, whiteSpace: "pre-wrap" },
-    tip: { fontSize: 12, opacity: 0.8, marginTop: 8 },
-    // footer と btn は削除（閉じるボタン廃止） // 修正
-  };
-
-  return (
-    <div
-      style={styles.overlay}
-      // onClick={(e)=>e.target===e.currentTarget && onClose?.()} // 修正: クリックで閉じない
-      role="presentation" // 追記: 背景は操作不可
-    >
+  const node = (
+    // CSSは当てない。classNameは将来のCSS Modules用フック。
+    <div role="presentation" className="overlay">
       <div
-        style={styles.modal}
-        role="alertdialog" // 修正: 重要通知として提示
+        role="alertdialog"
         aria-modal="true"
-        aria-label="ネットワークエラーモーダル"
-        // onKeyDown={(e)=> e.key==='Escape' && onClose?.()} // 修正: Escapeでも閉じない
+        aria-labelledby="neterr-title"
+        aria-describedby="neterr-desc"
+        className="dialog"
       >
-        <div style={styles.head}>
-          <div style={styles.badge}>!</div>
-          <div style={styles.title}>オフラインです</div>
+        <div className="head">
+          <strong className="badge">!</strong>
+          <span id="neterr-title" className="title">オフラインです</span>
         </div>
-        <div style={styles.msg}>
-          ネットワークに接続できません。回線・Wi-Fi をご確認ください。<br />
+
+        <p id="neterr-desc" className="message">
+          ネットワークに接続できません。回線・Wi-Fi をご確認ください。
+          <br />
           復旧すると自動で閉じます。（201）
-        </div>
-        <div style={styles.tip}>
+        </p>
+
+        <p className="tip">
           それでもダメな場合：ブラウザの拡張機能やプロキシ、VPN、企業ネットワークの制限をご確認ください。
-        </div>
-        {/* フッター/ボタンなし（常時表示） */} {/* 修正 */}
+        </p>
+
+        {/* フッターやボタンは意図的に未提供（常時表示） */}
       </div>
     </div>
   );
+
+  return createPortal(node, document.body);
 }

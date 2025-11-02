@@ -1,6 +1,6 @@
 // src/components/ErrorModal.tsx
-import React from "react"; // 追記
-import { createPortal } from "react-dom"; // 追記
+import React from "react";
+import { createPortal } from "react-dom";
 
 type Props = {
   open: boolean;
@@ -19,81 +19,34 @@ export default function ErrorModal({
 }: Props) {
   if (!open) return null;
 
-  const styles: Record<string, React.CSSProperties> = {
-    overlay: {
-      position: "fixed",
-      inset: 0,
-      background: "rgba(0,0,0,.22)",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      zIndex: 999999, // 修正: 5000 → 999999（最前面に出すため）
-    },
-    modal: {
-      position: "relative",
-      width: 420,
-      background: "#fff",
-      borderRadius: 12,
-      boxShadow: "0 8px 24px rgba(0,0,0,.18)",
-      padding: 16,
-    },
-    head: { display: "flex", alignItems: "center", gap: 10, marginBottom: 8 },
-    badge: {
-      width: 20,
-      height: 20,
-      borderRadius: 9999,
-      background: "#fa5252",
-      color: "#fff",
-      display: "grid",
-      placeItems: "center",
-      fontSize: 14,
-      fontWeight: 900,
-      lineHeight: 1,
-    },
-    title: { fontWeight: 900, fontSize: 16 },
-    msg: { fontSize: 14, lineHeight: 1.6, whiteSpace: "pre-wrap" },
-    footer: {
-      marginTop: 12,
-      display: "flex",
-      justifyContent: onRetry ? "space-between" : "flex-end",
-      gap: 8,
-    },
-    btn: {
-      background: "#fff",
-      border: "1px solid rgba(0,0,0,.85)",
-      borderRadius: 8,
-      padding: "8px 16px",
-      fontWeight: 800,
-      cursor: "pointer",
-    },
-  };
-
   const node = (
+    // CSSは当てていない。classNameは将来のCSS Modules用フック。
     <div
-      style={styles.overlay}
-      onClick={(e: React.MouseEvent<HTMLDivElement>) => {
-        if (e.target === e.currentTarget) onClose(); // 修正: イベント型を明示して安全に
-      }}
+      className="overlay"
+      onClick={(e) => e.target === e.currentTarget && onClose()}
     >
       <div
-        style={styles.modal}
+        className="dialog"
         role="dialog"
         aria-modal="true"
-        aria-label="エラーモーダル"
-        onClick={(e) => e.stopPropagation()} // 追記: 内側クリックでバブリング停止
+        aria-labelledby="err-title"
+        aria-describedby="err-msg"
+        onClick={(e) => e.stopPropagation()}
       >
-        <div style={styles.head}>
-          <div style={styles.badge}>!</div>
-          <div style={styles.title}>{title}</div>
+        <div className="head">
+          <strong className="badge">!</strong>
+          <span id="err-title" className="title">{title}</span>
         </div>
-        <div style={styles.msg}>{message}</div>
-        <div style={styles.footer}>
+
+        <div id="err-msg" className="message">{message}</div>
+
+        <div className="footer">
           {onRetry && (
-            <button type="button" style={styles.btn} onClick={onRetry}>
+            <button type="button" onClick={onRetry} className="retryBtn">
               再試行
             </button>
-          ) /* 修正: type="button" を付与 */}
-          <button type="button" style={styles.btn} onClick={onClose}>
+          )}
+          <button type="button" onClick={onClose} className="closeBtn">
             閉じる
           </button>
         </div>
@@ -101,5 +54,5 @@ export default function ErrorModal({
     </div>
   );
 
-  return createPortal(node, document.body); // 追記: Portal で <body> 直下に描画
+  return createPortal(node, document.body);
 }

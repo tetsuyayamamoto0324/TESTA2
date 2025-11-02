@@ -1,8 +1,8 @@
+// src/components/HeaderBar/HeaderBar.tsx
 import React, { useState } from "react";
 import Modal from "@/components/modal/Modal";
 import { useAuth } from "@/store/auth";
 import { triggerRefetch } from "@/lib/refetchBus";
-import s from "./HeaderBar.module.css"; // ← 追加
 
 type Props = {
   date?: Date;
@@ -60,9 +60,9 @@ export default function HeaderBar({
 
   return (
     <>
-      <header className={s.header}>
-        <div className={s.inner}>
-          <div className={s.dateText}>
+      <header className="header">
+        <div className="inner">
+          <div className="dateText">
             {month}/{d}
           </div>
 
@@ -70,16 +70,16 @@ export default function HeaderBar({
             type="button"
             aria-label="都市を変更"
             onClick={onCityClick}
-            className={s.cityBtn}
+            className="cityBtn"
             title="都市を変更"
           >
-            <span className={s.cityText}>{cityLabel}</span>
-            <span className={s.dowText}>（{dow}）</span>
+            <span className="cityText">{cityLabel}</span>
+            <span className="dowText">（{dow}）</span>
           </button>
 
           <button
             type="button"
-            className={s.menuBtn}
+            className="menuBtn"
             onClick={() => {
               onMenuClick?.();
               setMenuOpen(true);
@@ -91,49 +91,30 @@ export default function HeaderBar({
         </div>
       </header>
 
-      <div className={s.spacer} />
-
       <Modal open={menuOpen} onClose={() => setMenuOpen(false)}>
-        <div
-          className={s.modalWrap}
-          style={
-            {
-              "--modal-shift-x": "150px",
-              "--modal-shift-y": "0px",
-              "--title-offset-x": "5px",
-              "--title-offset-y": "0px",
-              "--email-offset-x": "0px",
-              "--refetch-offset-x": "40px",
-              "--refetch-offset-y": "0px",
-              "--logout-offset-x": "33px",
-              "--logout-offset-y": "0px",
-              "--refetch-align": "flex-start",
-              "--logout-align": "flex-start",
-            } as React.CSSProperties
-          }
-        >
-          <div className={s.modalTitle}>ログイン中のユーザー</div>
+        <div className="modalWrap">
+          <div className="modalTitle">ログイン中のユーザー</div>
 
-          <div className={s.emailRow}>
-            <span className={s.emailText}>{user?.email ?? "（未ログイン）"}</span>
+          <div className="emailRow">
+            <span className="emailText">{user?.email ?? "（未ログイン）"}</span>
           </div>
 
-          <div className={s.refetchRow}>
+          <div className="refetchRow">
             <button
               type="button"
               onClick={handleRefetchClick}
               disabled={refetching}
-              className={s.refetchBtn}
+              className="refetchBtn"
             >
               {refetching ? "再取得中…" : "再取得"}
             </button>
-            <span className={s.note}>{refetchMsg}</span>
+            <span className="note">{refetchMsg}</span>
           </div>
 
-          <hr className={s.hr} />
+          <hr className="hr" />
 
-          <div className={s.logoutRow}>
-            <button type="button" className={s.logoutBtn} onClick={handleLogout}>
+          <div className="logoutRow">
+            <button type="button" className="logoutBtn" onClick={handleLogout}>
               ログアウト
             </button>
           </div>

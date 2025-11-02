@@ -1,19 +1,13 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+// src/pages/CitySearch.tsx
+import React, { useEffect, useRef, useState } from "react";
 import { z } from "zod";
 import { useCity } from "@/store/city";
 import { useError } from "@/contexts/ErrorContext";
 import { validateResponseOrShow } from "@/lib/validate";
-import s from "./CitySearch.module.css"; // ← 追加
 
 const GEO_API = "https://api.openweathermap.org/geo/1.0/direct";
 const KEY = import.meta.env.VITE_OPENWEATHER_KEY as string;
 const DEFAULT_COUNTRY = "JP";
-
-const TITLE_SHIFT_X = 80;
-const TITLE_SHIFT_Y = -10;
-const PAGE_SHIFT_X = 710;
-const PAGE_SHIFT_Y = 150;
-const BOX_W = 420;
 
 const LS_KEY = "default-city-v1";
 
@@ -174,44 +168,26 @@ export default function CitySearch() {
   };
 
   return (
-    <div className={s.wrap}>
-      <div
-        className={s.shift}
-        style={
-          {
-            "--page-shift-x": `${PAGE_SHIFT_X}px`,
-            "--page-shift-y": `${PAGE_SHIFT_Y}px`,
-          } as React.CSSProperties
-        }
-      >
-        <div className={s.box} style={{ "--box-w": `${BOX_W}px` } as React.CSSProperties}>
-          <div
-            className={s.title}
-            style={
-              {
-                "--title-shift-x": `${TITLE_SHIFT_X}px`,
-                "--title-shift-y": `${TITLE_SHIFT_Y}px`,
-              } as React.CSSProperties
-            }
-          >
-            デフォルト都市検索
-          </div>
+    <div className="wrap">
+      <div className="shift">
+        <div className="box">
+          <div className="title">デフォルト都市検索</div>
 
           {saved && (
-            <div className={s.savedLine}>
+            <div className="savedLine">
               現在の設定：<strong>{saved.name}</strong>
               {saved.state ? `（${saved.state}）` : ""} / {saved.country}
             </div>
           )}
 
-          <div className={s.inputWrap}>
-            <svg viewBox="0 0 24 24" className={s.icon} aria-hidden>
+          <div className="inputWrap">
+            <svg viewBox="0 0 24 24" className="icon" aria-hidden>
               <circle cx="10.5" cy="10.5" r="7" stroke="currentColor" strokeWidth="2" fill="none" />
               <line x1="16" y1="16" x2="22" y2="22" stroke="currentColor" strokeWidth="2" />
             </svg>
 
             <input
-              className={s.input}
+              className="input"
               placeholder="都市名"
               value={q}
               onChange={(e) => setQ(e.target.value)}
@@ -220,22 +196,22 @@ export default function CitySearch() {
             />
           </div>
 
-          {error && <div className={s.err}>{error}</div>}
+          {error && <div className="err">{error}</div>}
           {!error && !loading && results.length === 0 && q.trim() && (
-            <div className={s.smallNote}>候補が見つかりませんでした</div>
+            <div className="smallNote">候補が見つかりませんでした</div>
           )}
 
           {results.length > 0 && (
-            <div className={s.list}>
+            <div className="list">
               {results.map((it, i) => (
-                <div key={`${it.name}-${it.lat}-${it.lon}-${i}`} className={s.item}>
+                <div key={`${it.name}-${it.lat}-${it.lon}-${i}`} className="item">
                   <div>
-                    <span className={s.itemHead}>{it.name}</span>
-                    <span className={s.itemSub}>
+                    <span className="itemHead">{it.name}</span>
+                    <span className="itemSub">
                       {it.state ? ` / ${it.state}` : ""} / {it.country}
                     </span>
                   </div>
-                  <button className={s.saveBtn} onClick={() => onSave(it)}>
+                  <button className="saveBtn" onClick={() => onSave(it)}>
                     設定
                   </button>
                 </div>
@@ -244,7 +220,7 @@ export default function CitySearch() {
           )}
 
           {saved && !results.length && !error && (
-            <div className={s.ok}>
+            <div className="ok">
               保存しました：{saved.name}（{saved.country}）
             </div>
           )}

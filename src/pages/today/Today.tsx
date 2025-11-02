@@ -1,16 +1,15 @@
 // src/pages/Today.tsx
 import { useEffect, useState, useCallback, useMemo } from "react";
-import { fetchCurrentByCoords, fetchTodayMaxPop } from "@/lib/openweather";
+import { z } from "zod";
 import HeaderBar from "@/components/layout/HeaderBar/HeaderBar";
 import WeatherHero from "@/components/weather/WeatherHero";
-import { jstYmd } from "@/lib/date-jst";
 import QuoteOfTheDay from "@/components/weather/QuoteOfTheDay";
 import OutfitSimple from "@/components/weather/OutfitSimple";
+import { fetchCurrentByCoords, fetchTodayMaxPop } from "@/lib/openweather";
+import { jstYmd } from "@/lib/date-jst";
+import { useError } from "@/contexts/ErrorContext";
+import { validateResponseOrShow } from "@/lib/validate";
 import s from "./Today.module.css";
-import type * as React from "react";
-import { useError } from "@/contexts/ErrorContext"; // 追記
-import { z } from "zod"; // 追記
-import { validateResponseOrShow } from "@/lib/validate"; // 追記
 
 type State = {
   name?: string;
@@ -30,7 +29,7 @@ type SavedCity = {
   lon: number;
 } | null;
 
-// OpenWeather 受信スキーマ（実際に使う最小限） // 追記
+// OpenWeather 受信スキーマ（最小限）
 const CurrentSchema = z.object({
   name: z.string().optional(),
   main: z.object({ temp: z.number().nullable().optional() }).optional(),
@@ -42,14 +41,14 @@ const CurrentSchema = z.object({
       })
     )
     .optional(),
-}); // 追記
+});
 const MaxPopSchema = z.number().min(0).max(1).nullable().optional();
 
 export default function Today() {
   const [state, setState] = useState<State>({ loading: true });
-  const showError = useError(); // 追記
+  const showError = useError();
 
-  // localStorage から都市設定（なければ東京都(35.6895, 139.6917)）
+  // localStorage から都市設定（なければ東京都）
   const saved: SavedCity = useMemo(() => {
     try {
       return JSON.parse(localStorage.getItem("default-city-v1") || "null");
@@ -62,41 +61,40 @@ export default function Today() {
   const lon = saved?.lon ?? 139.6917;
   const cityName = saved?.name ?? "東京都";
 
-  // 天気再取得（HeaderBar の「再取得」から呼ばれる）
+  // 天気再取得（HeaderBarからも呼べる）
   const refetchWeather = useCallback(async () => {
     try {
       const [curRaw, popRaw] = await Promise.all([
         fetchCurrentByCoords(lat, lon),
         fetchTodayMaxPop(lat, lon),
-      ]); // 修正
+      ]);
 
-      // スキーマ検証（NGならここでモーダル） // 追記
       const curChk = validateResponseOrShow({
         schema: CurrentSchema,
         data: curRaw,
         showError,
-        title: "データの読み取りに失敗しました", // 追記
-        code: "300", // 追記
-      }); // 追記
+        title: "データの読み取りに失敗しました",
+        code: "300",
+      });
       if (!curChk.ok) {
-        setState((s) => ({ ...s, loading: false })); // 追記
-        return; // 追記
+        setState((s) => ({ ...s, loading: false }));
+        return;
       }
 
       const popChk = validateResponseOrShow({
         schema: MaxPopSchema,
         data: popRaw,
         showError,
-        title: "降水確率データの読み取りに失敗しました", // 追記
-        code: "301", // 追記
-      }); // 追記
+        title: "降水確率データの読み取りに失敗しました",
+        code: "301",
+      });
       if (!popChk.ok) {
-        setState((s) => ({ ...s, loading: false })); // 追記
-        return; // 追記
+        setState((s) => ({ ...s, loading: false }));
+        return;
       }
 
-      const cur = curChk.data; // 追記
-      const pop = popChk.data; // 追記
+      const cur = curChk.data;
+      const pop = popChk.data;
 
       setState({
         name: cur.name || cityName,
@@ -106,45 +104,38 @@ export default function Today() {
         pop,
         loading: false,
         error: undefined,
-      }); // 修正
+      });
     } catch (e) {
-      // 通信エラー等はここで共通モーダル表示（NETWORK は専用モーダルへ） // 追記
-      showError(e, { retry: refetchWeather }); // 修正
-      setState((s) => ({ ...s, loading: false, error: undefined })); // 修正
+      showError(e, { retry: refetchWeather });
+      setState((s) => ({ ...s, loading: false, error: undefined }));
     }
-  }, [lat, lon, cityName, showError]); // 修正
+  }, [lat, lon, cityName, showError]);
 
   // 初回ロード
   useEffect(() => {
     (async () => {
       try {
         await refetchWeather();
-      } catch (e: any) {
-        showError(e, { retry: refetchWeather }); // 修正
-        setState((s) => ({ ...s, loading: false, error: undefined })); // 修正
+      } catch (e) {
+        showError(e, { retry: refetchWeather });
+        setState((s) => ({ ...s, loading: false, error: undefined }));
       }
     })();
-  }, [refetchWeather, showError]); // 修正
+  }, [refetchWeather, showError]);
 
-  if (state.loading) return <div style={{ padding: 16 }}>読み込み中…</div>;
-  if (state.error) return <div style={{ padding: 16, color: "#e03131" }}>{state.error}</div>;
+  if (state.loading) return <div className={s.loading}>読み込み中…</div>;
+  if (state.error) return <div className={s.error}>{state.error}</div>;
 
   const seed = jstYmd();
 
   return (
-    <>
-      {/* ヘッダー（都市名は保存値 or API 名、再取得を渡す） */}
+    <div className={s.todayPage}>
       <HeaderBar
         date={new Date()}
         city={cityName}
         onRefetchWeather={refetchWeather}
-        onCityClick={() => {
-          // ヘッダーの都市名タップで都市設定画面へ飛ばす場合は
-          // ルーターでやる（例：useNavigate("/city")）。必要ならここに実装。
-        }}
       />
 
-      {/* メインヒーロー（気温・アイコン等） */}
       <WeatherHero
         tempC={state.temp ?? null}
         iconCode={state.icon ?? null}
@@ -152,52 +143,18 @@ export default function Today() {
         desc={state.desc ?? ""}
       />
 
-      {/* 今日の格言（毎日固定 seed） */}
       <QuoteOfTheDay seed={seed} />
 
-      {/* 2カラム（服装 / ラッキーアイテム） */}
-      <section
-        className={`${s.twoCol} ${s.vline}`}
-        style={
-          {
-            "--vline-offset": "720px",
-            "--vline-offset-y": "50px",
-            "--vline-extend": "50px",
-          } as React.CSSProperties
-        }
-      >
-        <div>
+      <section className={s.twoColumn}>
+        <div className={`${s.col} ${s.outfitCol}`}>
           <OutfitSimple tempC={state.temp} />
         </div>
 
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            gap: 8,
-          }}
-        >
-          <div
-            style={{
-              fontWeight: 800,
-              fontSize: "clamp(16px, 2.2vw, 22px)",
-              transform: "translate(1200px, 50px)",
-            }}
-          >
-            ラッキーアイテム
-          </div>
-          <div
-            style={{
-              fontSize: "clamp(40px, 8vw, 72px)",
-              lineHeight: 1,
-              transform: "translate(1200px, 100px)",
-            }}
-          >
-            🧿
-          </div>
+        <div className={`${s.col} ${s.luckyCol}`}>
+          <div className={s.luckyTitle}>ラッキーアイテム</div>
+          <div className={s.luckyIcon}>🧿</div>
         </div>
       </section>
-    </>
+    </div>
   );
 }
