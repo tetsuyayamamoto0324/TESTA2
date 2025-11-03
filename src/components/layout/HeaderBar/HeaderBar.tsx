@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import Modal from "@/components/modal/Modal";
 import { useAuth } from "@/store/auth";
 import { triggerRefetch } from "@/lib/refetchBus";
+import s from "./HeaderBar.module.css";
 
 type Props = {
   date?: Date;
@@ -60,9 +61,9 @@ export default function HeaderBar({
 
   return (
     <>
-      <header className="header">
-        <div className="inner">
-          <div className="dateText">
+      <header className={s.header}>
+        <div className={s.inner}>
+          <div className={s.dateText}>
             {month}/{d}
           </div>
 
@@ -70,16 +71,16 @@ export default function HeaderBar({
             type="button"
             aria-label="都市を変更"
             onClick={onCityClick}
-            className="cityBtn"
+            className={s.cityBtn}
             title="都市を変更"
           >
-            <span className="cityText">{cityLabel}</span>
-            <span className="dowText">（{dow}）</span>
+            <span className={s.cityText}>{cityLabel}</span>
+            <span className={s.dowText}>（{dow}）</span>
           </button>
 
           <button
             type="button"
-            className="menuBtn"
+            className={s.menuBtn}
             onClick={() => {
               onMenuClick?.();
               setMenuOpen(true);

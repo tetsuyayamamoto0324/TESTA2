@@ -1,7 +1,7 @@
 // src/components/ProtectedLayout.tsx
 import { Outlet, useNavigate } from "react-router-dom";
 import HeaderBar from "./HeaderBar/HeaderBar";
-import BottomTabs from "./BottomTabs";
+import BottomTabs from "./BottomTabs/BottomTabs";
 import { useCity } from "@/store/city";
 import React from "react";
 
@@ -58,7 +58,6 @@ export default function ProtectedLayout({
       <main
         className="pageCenter"
         style={{
-          paddingBottom: tabbarHeight,
           // レイアウト全体のスクロールを抑え、必要なら中だけスクロール
           minHeight: 0,
         }}
@@ -68,10 +67,6 @@ export default function ProtectedLayout({
 
       {/* 固定フッター（タブ） */}
       <BottomTabs
-        // BottomTabs が position:fixed の場合でも高さを合わせておくと安心
-        style={{
-          height: tabbarHeight,
-        }}
       />
     </div>
   );

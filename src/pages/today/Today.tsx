@@ -130,31 +130,40 @@ export default function Today() {
 
   return (
     <div className={s.todayPage}>
+      {/* 1行目: ヘッダー */}
       <HeaderBar
         date={new Date()}
         city={cityName}
         onRefetchWeather={refetchWeather}
       />
 
-      <WeatherHero
-        tempC={state.temp ?? null}
-        iconCode={state.icon ?? null}
-        pop={state.pop ?? null}
-        desc={state.desc ?? ""}
-      />
+      {/* 2行目: 本文（←ここを追加） */}
+      <main className={s.main}>
+        <div className={s.mainInner}>
+          <WeatherHero
+            tempC={state.temp ?? null}
+            iconCode={state.icon ?? null}
+            pop={state.pop ?? null}
+            desc={state.desc ?? ""}
+          />
 
-      <QuoteOfTheDay seed={seed} />
+          <QuoteOfTheDay seed={seed} />
 
-      <section className={s.twoColumn}>
-        <div className={`${s.col} ${s.outfitCol}`}>
-          <OutfitSimple tempC={state.temp} />
+          <section className={s.twoColumn}>
+            <div className={`${s.col} ${s.outfitCol}`}>
+              <OutfitSimple tempC={state.temp} />
+            </div>
+
+            <div className={`${s.col} ${s.luckyCol}`}>
+              <div className={s.luckyTitle}>ラッキーアイテム</div>
+              <div className={s.luckyIcon}>🧿</div>
+            </div>
+          </section>
         </div>
+      </main>
 
-        <div className={`${s.col} ${s.luckyCol}`}>
-          <div className={s.luckyTitle}>ラッキーアイテム</div>
-          <div className={s.luckyIcon}>🧿</div>
-        </div>
-      </section>
+      {/* 3行目: タブ（このページで出す場合のみ） */}
+      {/* <BottomTabs className={s.tabbar} /> */}
     </div>
   );
 }

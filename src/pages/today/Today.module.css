@@ -29,6 +29,20 @@
   padding: 12px;
 }
 
+.mainInner {
+  display: flex;
+  flex-direction: column;   /* 縦並び */
+  justify-content: flex-start;
+  align-items: stretch;
+  gap: 16px;                /* セクション間の間隔 */
+}
+
+/* 余白は gap に一本化したいので保険（任意） */
+.mainInner > * {
+  margin: 0;
+  flex: 0 0 auto;
+}
+
 
 /* セクション間の余白だけ先に定義（細部は後で） */
 .twoColumn {

@@ -1,0 +1,40 @@
+.tabbar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+
+  height: 60px; /* 必要なら --tabbar-h 変数にしてもOK */
+  background: #f8fbff;
+  border-top: 1px solid rgba(0, 0, 0, 0.15);
+
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+
+  padding-bottom: env(safe-area-inset-bottom); /* iOS 安全領域 */
+  z-index: 50;
+}
+
+.link {
+  flex: 1 1 0;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 700;
+  padding: 6px 0;
+  color: #1f2530;
+  text-decoration: none;
+  border-bottom: 3px solid transparent;
+
+  -webkit-tap-highlight-color: transparent;
+}
+
+.link:focus-visible {
+  outline: 2px solid #1f6fff;
+  outline-offset: 2px;
+}
+
+.active {
+  color: #1f6fff;
+  border-bottom-color: #1f6fff;
+}

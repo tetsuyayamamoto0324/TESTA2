@@ -1,0 +1,98 @@
+/* ===== 大きさをまとめて調整するノブ =====
+   必要なら --h やフォント変数だけ変えればOK */
+.header {
+  /* 高さをしっかり確保（以前: 56px）*/
+  --h: 72px;
+
+  /* 各フォントの推奨サイズ帯（端末幅に追従） */
+  --fz-date: clamp(16px, 3.0vw, 18px);
+  --fz-city: clamp(26px, 6.2vw, 32px);
+  --fz-dow : clamp(15px, 3.6vw, 18px);
+  --fz-menu: clamp(15px, 3.6vw, 18px);
+
+  /* 余白・間隔 */
+  --pad-x: 0px;     /* 左右パディング（以前: 14px）*/
+  --gap  : 16px;     /* カラム間隔（以前: 12px）*/
+
+  height: var(--h);
+  background: #bfdeec;
+  position: relative;              /* 下線用 */
+}
+
+/* 下線を少し下へオフセット（好みで -1 ～ -4px） */
+.header::after {
+  content: "";
+  position: absolute;
+  left: 0; right: 0;
+  height: 1px;
+  background: rgba(0,0,0,.18);
+  bottom: 0px;
+}
+
+/* 3カラムで中央を厳密センター */
+.inner {
+  height: 100%;
+  max-width: 980px;
+  margin-inline: auto;
+  padding: 0 var(--pad-x);
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  column-gap: var(--gap);
+}
+
+/* 左：日付（大きめ＆視認性UP） */
+.dateText {
+  font-size: var(--fz-date);
+  font-weight: 700;
+  color: #1f2430;
+  opacity: .95;
+}
+
+/* 中央：都市名（しっかり大きく、太め） */
+.cityBtn {
+  justify-self: center;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 8px;                        /* 余白もやや拡大 */
+  padding: 6px 12px;
+  background: transparent;
+  border: 0;
+  border-radius: 8px;
+  color: #111;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.cityText {
+  font-size: var(--fz-city);
+  font-weight: 800;
+  letter-spacing: .02em;
+  line-height: 1.1;
+}
+.dowText {
+  font-size: var(--fz-dow);
+  color: rgba(0,0,0,.72);
+}
+
+/* 右：menu ピル（タップ域&存在感アップ） */
+.menuBtn {
+  justify-self: end;
+  padding: 10px 18px;              /* 以前より増量 */
+  line-height: 1;
+  font-weight: 800;
+  font-size: var(--fz-menu);
+  color: #111;
+  background: #fff;
+  border: 2px solid #111;          /* 枠も太く */
+  border-radius: 999px;
+  box-shadow: 0 0 0 1px rgba(0,0,0,.03) inset;
+  cursor: pointer;
+}
+.menuBtn:hover { background: #f6f7fb; }
+.menuBtn:active { transform: translateY(1px); }
+
+.menuBtn:focus-visible,
+.cityBtn:focus-visible {
+  outline: 2px solid #1f6fff;
+  outline-offset: 2px;
+}
