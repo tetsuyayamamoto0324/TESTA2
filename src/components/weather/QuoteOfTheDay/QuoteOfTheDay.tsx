@@ -1,4 +1,7 @@
 // src/components/QuoteOfTheDay.tsx
+import React from "react";
+import s from "./QuoteOfTheDay.module.css";
+
 function hash32(str: string): number {
   let h = 5381;
   for (let i = 0; i < str.length; i++) {
@@ -36,12 +39,9 @@ export default function QuoteOfTheDay({
   const quote = quotes[idx] ?? "";
 
   return (
-    // 見た目は当てない。classNameは将来のCSS Modules用フック。
-    <section aria-label="今日の格言" className="quoteSection">
-      <div className="inner">
-        <div className="title">{title}</div>
-        <div className="quote">{quote}</div>
+      <div className={s.inner}>
+        <div className={s.title}>{title}</div>
+        <div className={s.quote}>{quote}</div>
       </div>
-    </section>
   );
 }

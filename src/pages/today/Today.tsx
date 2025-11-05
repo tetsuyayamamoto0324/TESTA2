@@ -1,10 +1,11 @@
-// src/pages/Today.tsx
+// src/pages/today/Today.tsx
 import { useEffect, useState, useCallback, useMemo } from "react";
 import { z } from "zod";
 import HeaderBar from "@/components/layout/HeaderBar/HeaderBar";
-import WeatherHero from "@/components/weather/WeatherHero";
-import QuoteOfTheDay from "@/components/weather/QuoteOfTheDay";
-import OutfitSimple from "@/components/weather/OutfitSimple";
+import WeatherHero from "@/components/weather/WeatherHero/WeatherHero";
+import QuoteOfTheDay from "@/components/weather/QuoteOfTheDay/QuoteOfTheDay";
+import OutfitSimple from "@/components/weather/OutfitSimple/OutfitSimple";
+import LuckyItem from "@/components/weather/LuckyItem/LuckyItem";
 import { fetchCurrentByCoords, fetchTodayMaxPop } from "@/lib/openweather";
 import { jstYmd } from "@/lib/date-jst";
 import { useError } from "@/contexts/ErrorContext";
@@ -137,7 +138,7 @@ export default function Today() {
         onRefetchWeather={refetchWeather}
       />
 
-      {/* 2行目: 本文（←ここを追加） */}
+      {/* 2行目: 本文 */}
       <main className={s.main}>
         <div className={s.mainInner}>
           <WeatherHero
@@ -146,24 +147,14 @@ export default function Today() {
             pop={state.pop ?? null}
             desc={state.desc ?? ""}
           />
-
           <QuoteOfTheDay seed={seed} />
 
-          <section className={s.twoColumn}>
-            <div className={`${s.col} ${s.outfitCol}`}>
-              <OutfitSimple tempC={state.temp} />
-            </div>
-
-            <div className={`${s.col} ${s.luckyCol}`}>
-              <div className={s.luckyTitle}>ラッキーアイテム</div>
-              <div className={s.luckyIcon}>🧿</div>
-            </div>
+          <section className={s.outfitLucky}>
+            <OutfitSimple tempC={state.temp ?? null} />
+            <LuckyItem imgSrc="/images/kappa.png" label="カッパ" />
           </section>
         </div>
       </main>
-
-      {/* 3行目: タブ（このページで出す場合のみ） */}
-      {/* <BottomTabs className={s.tabbar} /> */}
     </div>
   );
 }

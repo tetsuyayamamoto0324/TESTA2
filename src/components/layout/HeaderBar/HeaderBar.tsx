@@ -65,19 +65,9 @@ export default function HeaderBar({
         <div className={s.inner}>
           <div className={s.dateText}>
             {month}/{d}
+            {dow}
           </div>
-
-          <button
-            type="button"
-            aria-label="都市を変更"
-            onClick={onCityClick}
-            className={s.cityBtn}
-            title="都市を変更"
-          >
-            <span className={s.cityText}>{cityLabel}</span>
-            <span className={s.dowText}>（{dow}）</span>
-          </button>
-
+          <div className={s.cityText}>{cityLabel}</div>
           <button
             type="button"
             className={s.menuBtn}

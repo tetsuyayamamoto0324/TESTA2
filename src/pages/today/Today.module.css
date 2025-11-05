@@ -1,67 +1,8 @@
-/* 画面全体の背景とレイアウト */
-.todayPage {
-  height: 100dvh;                      /* min-height ではなく height に */
-  background: #bfdeec;
-  display: grid;                       /* ヘッダー/本文/タブの3分割想定 */
-  grid-template-rows: var(--header-h, 56px) 1fr var(--tabbar-h, 64px);
-  overflow: hidden;                    /* ← ページ全体のスクロールを止める */
+body {
+  background-color: rgb(145, 213, 245);
 }
-
-/* ヘッダー＆タブの例（高さが無いと背景が塗られないことがある）*/
-.header {
-  height: var(--header-h, 56px);
-  background: #eaf6ff;
-  display: flex; align-items: center; gap: 8px;
-  padding: 0 12px;
-}
-
-.tabbar {
-  height: var(--tabbar-h, 64px);
-  background: #f7f7fb;
-  border-top: 1px solid #e2e6ef;
-  display: grid; grid-auto-flow: column; place-items: center;
-}
-
-/* 本文だけスクロール可能にする */
-.main {
-  min-height: 0;                       /* ← これが無いと grid 内で溢れやすい */
-  overflow: auto;                      /* ← スクロールはここだけ */
-  padding: 12px;
-}
-
-.mainInner {
+.outfitLucky{
   display: flex;
-  flex-direction: column;   /* 縦並び */
-  justify-content: flex-start;
-  align-items: stretch;
-  gap: 16px;                /* セクション間の間隔 */
+  justify-content: center;
+  padding-top: 97px;
 }
-
-/* 余白は gap に一本化したいので保険（任意） */
-.mainInner > * {
-  margin: 0;
-  flex: 0 0 auto;
-}
-
-
-/* セクション間の余白だけ先に定義（細部は後で） */
-.twoColumn {
-  margin-top: 16px;
-  display: grid;
-  gap: 12px;
-}
-
-/* モバイル1カラム → 横幅が出たら2カラム */
-@media (min-width: 720px) {
-  .twoColumn { grid-template-columns: 1fr 1fr; }
-}
-
-.col {}
-.outfitCol {}
-.luckyCol {}
-.luckyTitle { font-weight: 800; margin-bottom: 6px; }
-.luckyIcon { font-size: 40px; line-height: 1; }
-
-/* 既存のローディング／エラー用（必要なら） */
-.loading { padding: 16px; }
-.error { padding: 16px; color: #e03131; }
