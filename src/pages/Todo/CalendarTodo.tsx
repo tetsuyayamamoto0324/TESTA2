@@ -5,6 +5,8 @@ import { z } from "zod";
 import { supabase } from "@/lib/supabase";
 import { useError } from "@/contexts/ErrorContext";
 import { useAuth } from "@/store/auth";
+import s from "./CalendarTodo.module.css";
+import HeaderBar from "@/components/layout/HeaderBar/HeaderBar";
 
 const REMOTE_TODO_ENABLED = import.meta.env.VITE_TODO_REMOTE === "1";
 const ERROR_MODAL_ENABLED = import.meta.env.VITE_TODO_ERROR_MODAL === "1";
@@ -242,21 +244,20 @@ export default function CalendarTodo() {
   })();
 
   return (
-    <>
-      <div className="wrap">
-        <div className="shift">
-          <div className="box">
-            <div className="title">ToDoカレンダー</div>
+    <div className={s.ToDoPage}>
+      <HeaderBar />
+      <div className={s.wrap}>
+        <div className={s.shift}>
+          <div className={s.box}>
+            <div className={s.title}>ToDoカレンダー</div>
 
-            {/* 曜日ヘッダ */}
-            <div className="weekHead">
+            <div className={s.weekHead}>
               {week.map((w) => (
-                <div key={w} className="weekCell">{w}</div>
+                <div key={w} className={s.weekCell}>{w}</div>
               ))}
             </div>
 
-            {/* 本体グリッド（7×6） */}
-            <div className="grid">
+            <div className={s.grid}>
               {cells.map(({ date, inMonth }) => {
                 const key = ymd(date);
                 const list = todos[key] ?? [];
@@ -268,26 +269,26 @@ export default function CalendarTodo() {
                 return (
                   <div
                     key={key}
-                    className={`cell${inMonth ? "" : " outCell"}`}
+                    className={`${s.cell} ${inMonth ? "" : s.outCell}`}
                     onClick={() => editDay(date)}
                     title="クリックでこの日のToDoを編集"
                   >
-                    <div className="dateNum">{date.getDate()}</div>
+                    <div className={s.dateNum}>{date.getDate()}</div>
 
                     {list.length > 0 &&
                       (isLong ? (
-                        <div className="todoOneLineCenter" title={first}>
+                        <div className={s.todoOneLineCenter} title={first}>
                           {clip(first, LONG_LINE_MAX)}
                         </div>
                       ) : (
-                        <div className="todoList">
+                        <div className={s.todoList}>
                           {list.slice(0, 3).map((t, i) => (
-                            <div key={i} className="todoItem" title={t}>
+                            <div key={i} className={s.todoItem} title={t}>
                               {clip(t, ITEM_LINE_MAX)}
                             </div>
                           ))}
                           {list.length > 3 && (
-                            <div className="todoItem more">
+                            <div className={`${s.todoItem} ${s.more}`}>
                               +{list.length - 3} more
                             </div>
                           )}
@@ -298,27 +299,25 @@ export default function CalendarTodo() {
               })}
             </div>
 
-            {/* 下部ナビゲーション */}
-            <div className="navRow">
-              <div className="navBtn navPrevOffset" onClick={prev}>
-                <div className="navTxt">{prevMonthText}</div>
-                <div className="arrow" aria-hidden>←</div>
+            <div className={s.navRow}>
+              <div className={`${s.navBtn} ${s.navPrevOffset}`} onClick={prev}>
+                <div className={s.navTxt}>{prevMonthText}</div>
+                <div className={s.arrow} aria-hidden>←</div>
               </div>
 
-              <div className="centerYM navCenterOffset">
+              <div className={`${s.centerYM} ${s.navCenterOffset}`}>
                 {viewYear} / {titleMonth}
               </div>
 
-              <div className="navBtn navNextOffset" onClick={next}>
-                <div className="navTxt">{nextMonthText}</div>
-                <div className="arrow" aria-hidden>→</div>
+              <div className={`${s.navBtn} ${s.navNextOffset}`} onClick={next}>
+                <div className={s.navTxt}>{nextMonthText}</div>
+                <div className={s.arrow} aria-hidden>→</div>
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* モーダル */}
       <TodoModal
         open={modalOpen}
         dateText={modalDate ? ymd(modalDate) : ""}
@@ -328,6 +327,6 @@ export default function CalendarTodo() {
         onSave={handleSaveModal}
         onClose={() => setModalOpen(false)}
       />
-    </>
+    </div>
   );
 }

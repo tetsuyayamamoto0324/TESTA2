@@ -1,0 +1,193 @@
+/* ページ全体（ヘッダーの下の余白もここで確保） */
+.ToDoPage {
+    min-height: 100vh;
+}
+
+/* カレンダー全体を中央寄せ */
+.wrap {
+    max-width: 960px;
+    margin: 0 auto;
+  padding: 88px 16px 32px; /* ヘッダー高さぶん上に余白をとる */
+    box-sizing: border-box;
+}
+
+/* 必要なら微調整用のラッパ（今は中央寄せ用にそのまま） */
+.shift {
+    display: flex;
+    justify-content: center;
+}
+
+/* カレンダーの枠 */
+.box {
+    width: 100%;
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.15);
+    padding: 20px 20px 16px;
+}
+
+/* タイトル */
+.title {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 12px;
+    text-align: center;
+}
+
+/* 曜日ヘッダ行 */
+.weekHead {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    text-align: center;
+    font-size: 12px;
+    color: #6b7280;
+    margin-bottom: 4px;
+}
+
+/* 曜日セル */
+.weekCell {
+    padding: 4px 0;
+}
+
+/* 本体グリッド（7列 × 6行） */
+.grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    grid-auto-rows: 80px;
+    gap: 4px;
+    margin-bottom: 12px;
+}
+
+/* 日付セルの基本見た目 */
+.cell {
+    position: relative;
+    background: #f9fafb;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+    padding: 4px 4px 4px 6px;
+    box-sizing: border-box;
+    cursor: pointer;
+    overflow: hidden;
+    transition: background-color 0.12s ease, box-shadow 0.12s ease,
+    transform 0.08s ease;
+}
+
+.cell:hover {
+    background-color: #eef2ff;
+    box-shadow: 0 4px 10px rgba(79, 70, 229, 0.12);
+    transform: translateY(-1px);
+}
+
+/* 当月以外の日付（グレーアウト） */
+.outCell {
+    background: #f3f4f6;
+    color: #9ca3af;
+    opacity: 0.8;
+}
+
+/* 日付数字（右上） */
+.dateNum {
+    position: absolute;
+    top: 4px;
+    right: 6px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+/* 1行だけ中央に出すパターン（長文対策） */
+.todoOneLineCenter {
+    margin-top: 24px;
+    font-size: 11px;
+    text-align: center;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+/* 複数行ToDo表示用コンテナ */
+.todoList {
+    margin-top: 18px;
+    padding-right: 4px;
+}
+
+/* 1件のToDo行 */
+.todoItem {
+  font-size: 10px;
+  line-height: 1.4;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+/* 「+n more」 表示 */
+.more {
+  color: #6b7280;
+}
+
+/* 下部ナビゲーション行 */
+.navRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 8px;
+  font-size: 13px;
+}
+
+/* 前月／次月ボタン */
+.navBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  border-radius: 999px;
+  border: 1px solid #e5e7eb;
+  background: #f9fafb;
+  cursor: pointer;
+  transition: background-color 0.12s ease, border-color 0.12s ease,
+    transform 0.08s ease;
+}
+
+.navBtn:hover {
+  background: #eef2ff;
+  border-color: #4f46e5;
+  transform: translateY(-1px);
+}
+
+.navTxt {
+  font-size: 12px;
+}
+
+.arrow {
+  font-size: 12px;
+}
+
+/* 中央の年月表示 */
+.centerYM {
+  font-weight: 600;
+}
+
+/* 位置調整用クラス（必要に応じて微調整） */
+.navPrevOffset {
+  margin-left: 4px;
+}
+
+.navNextOffset {
+  margin-right: 4px;
+}
+
+.navCenterOffset {
+  text-align: center;
+  min-width: 120px;
+}
+
+/* ローディング／エラー用があれば（任意） */
+.loading,
+.error {
+  padding: 88px 16px;
+  text-align: center;
+  font-size: 14px;
+}
+
+.error {
+  color: #b91c1c;
+}

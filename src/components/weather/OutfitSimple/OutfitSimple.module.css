@@ -1,4 +1,17 @@
 .inner {
-  justify-content: center;
-  padding-right: 400px;
+  text-align: center;
+}
+
+.title {
+  font-weight: 700;
+  font-size: 30px;
+}
+
+.emoji {
+  font-size: 60px;
+}
+
+.label{
+  font-weight: 700;
+  font-size: 25px;
 }

@@ -131,7 +131,6 @@ export default function Today() {
 
   return (
     <div className={s.todayPage}>
-      {/* 1行目: ヘッダー */}
       <HeaderBar
         date={new Date()}
         city={cityName}
@@ -147,11 +146,15 @@ export default function Today() {
             pop={state.pop ?? null}
             desc={state.desc ?? ""}
           />
-          <QuoteOfTheDay seed={seed} />
+          <QuoteOfTheDay />
 
           <section className={s.outfitLucky}>
-            <OutfitSimple tempC={state.temp ?? null} />
-            <LuckyItem imgSrc="/images/kappa.png" label="カッパ" />
+            <div className={s.outfitInner}>
+              <OutfitSimple tempC={state.temp ?? null} />
+            </div>
+            <div className={s.luckyInner}>
+              <LuckyItem  />
+            </div>
           </section>
         </div>
       </main>

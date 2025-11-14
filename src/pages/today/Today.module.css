@@ -3,6 +3,21 @@ body {
 }
 .outfitLucky{
   display: flex;
+  border-top: 1px solid rgba(0,0,0,.12);
+  align-items: flex-start;
+}
+
+.outfitInner {
+  padding-top: 80px;
+  width: 50%;
+  display: grid;
   justify-content: center;
-  padding-top: 97px;
+}
+
+.luckyInner {
+  width: 50%;
+  display: grid;
+  padding: 80px 30px 40px 30px;
+  justify-content: center;
+  border-left: 1px solid rgba(0,0,0,.12);
 }

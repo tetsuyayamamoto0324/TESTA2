@@ -1,3 +1,4 @@
+// src/components/weather/WeatherHero.tsx
 import React from "react";
 import s from "./WeatherHero.module.css";
 
@@ -9,19 +10,13 @@ type Props = {
   className?: string;   // 例: s.compact / s.spacious / s.narrow を親から付与
 };
 
-const cx = (...xs: Array<string | false | undefined>) => xs.filter(Boolean).join(" ");
-
 export default function WeatherHero({ tempC, iconCode, pop, desc, className }: Props) {
   const temp = typeof tempC === "number" ? Math.round(tempC) : null;
-  const popPct =
-    typeof pop === "number" ? Math.round(pop <= 1 ? pop * 100 : pop) : null;
-
-  const iconUrl = iconCode
-    ? `https://openweathermap.org/img/wn/${iconCode}@2x.png`
-    : null;
+  const popPct = typeof pop === "number" ? Math.round(pop <= 1 ? pop * 100 : pop) : null;
+  const iconUrl = iconCode ? `https://openweathermap.org/img/wn/${iconCode}@2x.png` : null;
 
   return (
-    <section aria-label="現在の天気概要" className={cx(s.hero, className)}>
+    <div aria-label="現在の天気概要" className={[s.hero, className].filter(Boolean).join(" ")}>
       <div className={s.inner}>
         <div className={s.temp}>{temp !== null ? `${temp}℃` : "—"}</div>
 
@@ -38,6 +33,6 @@ export default function WeatherHero({ tempC, iconCode, pop, desc, className }: P
           降水 <span className={s.popNum}>{popPct !== null ? `${popPct}%` : "—"}</span>
         </div>
       </div>
-    </section>
+    </div>
   );
 }

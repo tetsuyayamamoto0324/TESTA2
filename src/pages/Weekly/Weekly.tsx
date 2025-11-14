@@ -1,6 +1,8 @@
 // src/pages/Weekly.tsx
 import { useEffect, useState } from "react";
 import { fetchDailyFromForecast } from "@/lib/openweather";
+import s from "./Weekly.module.css";
+import HeaderBar from "@/components/layout/HeaderBar/HeaderBar";
 
 const enWeek = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
 
@@ -21,16 +23,16 @@ function DayCard({ d }: { d: Day }) {
   const desc = d.weather?.[0]?.description ?? "";
 
   return (
-    <div className="card">
-      <div className="week">{wk}</div>
+    <div className={s.card}>
+      <div className={s.week}>{wk}</div>
       <img
         src={`https://openweathermap.org/img/wn/${icon}@2x.png`}
         alt={desc || "weather"}
-        className="icon"
+        className={s.icon}
       />
-      <div className="temp">
+      <div className={s.temp}>
         {max}℃ / {min}℃
-        <div className="pop">降水 {pop}%</div>
+        <div className={s.pop}>降水 {pop}%</div>
       </div>
     </div>
   );
@@ -41,7 +43,8 @@ export default function Weekly() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const lat = 35.6895, lon = 139.6917;
+    const lat = 35.6895,
+      lon = 139.6917;
     (async () => {
       try {
         const daily = await fetchDailyFromForecast(lat, lon);
@@ -52,17 +55,19 @@ export default function Weekly() {
     })();
   }, []);
 
-  if (!days && !error) return <div className="loading">読み込み中…</div>;
-  if (error) return <div className="error">{error}</div>;
+  if (!days && !error) return <div className={s.loading}>読み込み中…</div>;
+  if (error) return <div className={s.error}>{error}</div>;
 
   return (
-    <div className="wrap">
-      <div className="title">週間予報</div>
-
-      <div className="grid">
-        {days!.map((d) => (
-          <DayCard key={d.dt} d={d} />
-        ))}
+    <div className={s.weeklyPage}>
+      <HeaderBar />
+      <h1 className={s.title}>週間予報</h1>
+      <div className={s.wrap}>
+        <div className={s.grid}>
+          {days!.map((d) => (
+            <DayCard key={d.dt} d={d} />
+          ))}
+        </div>
       </div>
     </div>
   );

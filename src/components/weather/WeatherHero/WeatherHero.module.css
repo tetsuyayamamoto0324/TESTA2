@@ -1,16 +1,14 @@
 /* === セクション全体（背景は親の水色を使用） === */
 .hero {
   border-bottom: 1px solid rgba(0,0,0,.12);
-  border-top: 1px solid rgba(0,0,0,.12);
-  padding: 20px;
+  padding: 30px;
 }
 
 /* === 中身のレイアウト（左右の距離/最大幅をここで制御） === */
 .inner {
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 365px;
+  justify-content: space-around;
 }
 
 /* === 左：温度 === */

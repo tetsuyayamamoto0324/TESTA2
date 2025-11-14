@@ -19,7 +19,6 @@ export default function HeaderBar({
   date = new Date(),
   city,
   onMenuClick,
-  onCityClick,
   onRefetchWeather,
 }: Props) {
   const cityLabel = city && city.trim() ? city : "東京都";

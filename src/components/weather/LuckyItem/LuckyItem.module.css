@@ -1,7 +1,15 @@
-.box{
-  border-left: 1px solid rgba(0,0,0,.12);
+.inner {
+  text-align: center;
+  font-size: 20px;
 }
-.inner{
-  justify-content: center;
-  padding-left: 400px;
+.title {
+  font-weight: 700;
+  font-size: 30px;
+}
+.emoji  {
+  font-size: 55px;
+}
+.label {
+  font-weight: 700;
+  font-size: 25px;
 }
