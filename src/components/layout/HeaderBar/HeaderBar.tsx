@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import Modal from "@/components/modal/Modal";
 import { useAuth } from "@/store/auth";
 import { triggerRefetch } from "@/lib/refetchBus";
+import { useCity } from "@/store/city"; // ★ 追加
 import s from "./HeaderBar.module.css";
 
 type Props = {
@@ -21,8 +22,47 @@ export default function HeaderBar({
   onMenuClick,
   onRefetchWeather,
 }: Props) {
-  const cityLabel = city && city.trim() ? city : "東京都";
   const { user, signOut } = useAuth();
+
+  // src/components/HeaderBar/HeaderBar.tsx などに追加
+
+function toJapanesePrefName(city: { state?: string; name: string }): string {
+  // OpenWeather の state は "Osaka Prefecture" などなので、
+  // " Prefecture" を消して素の名前だけにする
+  const baseEn = city.state ?? city.name; // Kyoto / Osaka Prefecture / Tokyo ...
+  const plain = baseEn.replace(/ Prefecture$/, "");
+
+  // 特別扱い（都・道・府）
+  if (plain === "Tokyo") return "東京都";
+  if (plain === "Hokkaido") return "北海道";
+  if (plain === "Osaka") return "大阪府";
+  if (plain === "Kyoto") return "京都府";
+
+  // それ以外は 〇〇県 として扱う
+  return `${plain}県`;
+}
+
+const { city: currentCity } = useCity();
+
+const storeCityLabel = React.useMemo(() => {
+  if (!currentCity) return "";
+
+  // 日本の場合だけ都道府県名に変換
+  if (currentCity.country === "JP") {
+    return toJapanesePrefName(currentCity);
+  }
+
+  // 海外はとりあえず city 名（日本語ローカル名があればそれ）を表示
+  const ja = currentCity.local_names?.ja;
+  return ja ?? currentCity.name;
+}, [currentCity]);
+
+  // ★ 既存の city props があればそちらを優先し、
+  //    なければ store の都市名、それもなければデフォルト「東京都」
+  const cityLabel =
+    city && city.trim()
+      ? city.trim()
+      : storeCityLabel || "東京都";
 
   const month = date.getMonth() + 1;
   const d = date.getDate();
@@ -42,7 +82,9 @@ export default function HeaderBar({
         return;
       }
       const executed = await triggerRefetch();
-      setRefetchMsg(executed ? "最新の天気を取得しました" : "この画面では再取得できません");
+      setRefetchMsg(
+        executed ? "最新の天気を取得しました" : "この画面では再取得できません"
+      );
     } catch {
       setRefetchMsg("取得に失敗しました");
     } finally {
@@ -86,7 +128,9 @@ export default function HeaderBar({
           <div className="modalTitle">ログイン中のユーザー</div>
 
           <div className="emailRow">
-            <span className="emailText">{user?.email ?? "（未ログイン）"}</span>
+            <span className="emailText">
+              {user?.email ?? "（未ログイン）"}
+            </span>
           </div>
 
           <div className="refetchRow">
@@ -104,7 +148,11 @@ export default function HeaderBar({
           <hr className="hr" />
 
           <div className="logoutRow">
-            <button type="button" className="logoutBtn" onClick={handleLogout}>
+            <button
+              type="button"
+              className="logoutBtn"
+              onClick={handleLogout}
+            >
               ログアウト
             </button>
           </div>

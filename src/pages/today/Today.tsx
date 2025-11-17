@@ -131,11 +131,7 @@ export default function Today() {
 
   return (
     <div className={s.todayPage}>
-      <HeaderBar
-        date={new Date()}
-        city={cityName}
-        onRefetchWeather={refetchWeather}
-      />
+      <HeaderBar />
 
       {/* 2行目: 本文 */}
       <main className={s.main}>

@@ -8,6 +8,7 @@ export type City = {
   lon: number;
   country?: string;
   state?: string;
+  local_names?: Record<string, string>;
 };
 
 // 東京をデフォルト

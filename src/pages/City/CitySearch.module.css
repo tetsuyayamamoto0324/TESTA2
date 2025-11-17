@@ -1,0 +1,21 @@
+.ToDoPage {
+  min-height: 100vh;
+  background-color: rgb(145, 213, 245);
+}
+
+.wrap {
+  padding-top: 300px;
+}
+
+.shift {
+  display: flex;
+  justify-content: center;
+}
+
+.box {
+  width: 40%;
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.15);
+  padding: 24px 20px 20px;
+}
