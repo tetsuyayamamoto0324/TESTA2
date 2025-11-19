@@ -1,8 +1,9 @@
 // src/pages/Weekly.tsx
 import { useEffect, useState } from "react";
 import { fetchDailyFromForecast } from "@/lib/openweather";
-import s from "./Weekly.module.css";
 import HeaderBar from "@/components/layout/HeaderBar/HeaderBar";
+import { useCity } from "@/store/city";
+import s from "./Weekly.module.css";
 
 const enWeek = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
 
@@ -42,21 +43,46 @@ export default function Weekly() {
   const [days, setDays] = useState<Day[] | null>(null);
   const [error, setError] = useState<string | null>(null);
 
+  // ★ Zustand から現在の都市を取得
+  const { city } = useCity();
+
   useEffect(() => {
-    const lat = 35.6895,
-      lon = 139.6917;
+    // city がまだ読めていない場合の保護
+    if (!city || typeof city.lat !== "number" || typeof city.lon !== "number") {
+      return;
+    }
+
+    setDays(null);
+    setError(null);
+
     (async () => {
       try {
-        const daily = await fetchDailyFromForecast(lat, lon);
+        const daily = await fetchDailyFromForecast(city.lat, city.lon);
         setDays(daily as Day[]);
       } catch (e: any) {
         setError(e?.message ?? String(e));
       }
     })();
-  }, []);
+  }, [city.lat, city.lon]); // ★ 都市が変わるたびに再取得
 
-  if (!days && !error) return <div className={s.loading}>読み込み中…</div>;
-  if (error) return <div className={s.error}>{error}</div>;
+  // ローディング・エラー時も HeaderBar は出したいならこうする
+  if (!days && !error) {
+    return (
+      <div className={s.weeklyPage}>
+        <HeaderBar />
+        <div className={s.loading}>読み込み中…</div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className={s.weeklyPage}>
+        <HeaderBar />
+        <div className={s.error}>{error}</div>
+      </div>
+    );
+  }
 
   return (
     <div className={s.weeklyPage}>

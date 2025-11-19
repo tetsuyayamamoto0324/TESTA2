@@ -1,6 +1,6 @@
 // src/components/HeaderBar/HeaderBar.tsx
 import React, { useState } from "react";
-import Modal from "@/components/modal/Modal";
+import Modal from "@/components/modal/menumodal/Modal";
 import { useAuth } from "@/store/auth";
 import { triggerRefetch } from "@/lib/refetchBus";
 import { useCity } from "@/store/city"; // ★ 追加
@@ -45,16 +45,7 @@ function toJapanesePrefName(city: { state?: string; name: string }): string {
 const { city: currentCity } = useCity();
 
 const storeCityLabel = React.useMemo(() => {
-  if (!currentCity) return "";
-
-  // 日本の場合だけ都道府県名に変換
-  if (currentCity.country === "JP") {
-    return toJapanesePrefName(currentCity);
-  }
-
-  // 海外はとりあえず city 名（日本語ローカル名があればそれ）を表示
-  const ja = currentCity.local_names?.ja;
-  return ja ?? currentCity.name;
+  return currentCity?.name ?? "";
 }, [currentCity]);
 
   // ★ 既存の city props があればそちらを優先し、
@@ -122,42 +113,6 @@ const storeCityLabel = React.useMemo(() => {
           </button>
         </div>
       </header>
-
-      <Modal open={menuOpen} onClose={() => setMenuOpen(false)}>
-        <div className="modalWrap">
-          <div className="modalTitle">ログイン中のユーザー</div>
-
-          <div className="emailRow">
-            <span className="emailText">
-              {user?.email ?? "（未ログイン）"}
-            </span>
-          </div>
-
-          <div className="refetchRow">
-            <button
-              type="button"
-              onClick={handleRefetchClick}
-              disabled={refetching}
-              className="refetchBtn"
-            >
-              {refetching ? "再取得中…" : "再取得"}
-            </button>
-            <span className="note">{refetchMsg}</span>
-          </div>
-
-          <hr className="hr" />
-
-          <div className="logoutRow">
-            <button
-              type="button"
-              className="logoutBtn"
-              onClick={handleLogout}
-            >
-              ログアウト
-            </button>
-          </div>
-        </div>
-      </Modal>
     </>
   );
 }
