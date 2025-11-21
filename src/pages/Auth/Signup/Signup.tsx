@@ -1,12 +1,13 @@
 // src/pages/Auth/Signup.tsx
 import { useState } from "react";
-import { supabase } from "../../lib/supabase";
+import { supabase } from "../../../lib/supabase";
 import { z } from "zod";
 import { Alert, Title } from "@mantine/core";
 import { useNavigate, Link } from "react-router-dom";
-import { useAuth } from "../../store/auth";
+import { useAuth } from "../../../store/auth";
 import { useError } from "@/contexts/ErrorContext";
 import { normalizeError, messageFor } from "@/lib/appError";
+import s from "./Signup.module.css";
 
 const schema = z.object({
   email: z.string().min(1, "メールは必須です").email("メール形式が不正です"),
@@ -33,15 +34,22 @@ export default function Signup() {
     setEmail(v);
     if (submittedOnce) {
       const r = schema.pick({ email: true }).safeParse({ email: v });
-      setEmailErr(r.success ? null : r.error.flatten().fieldErrors.email?.[0] ?? null);
+      setEmailErr(
+        r.success ? null : r.error.flatten().fieldErrors.email?.[0] ?? null
+      );
     }
   };
+
   const onChangePassword = (e: React.ChangeEvent<HTMLInputElement>) => {
     const v = e.target.value;
     setPassword(v);
     if (submittedOnce) {
       const r = schema.pick({ password: true }).safeParse({ password: v });
-      setPasswordErr(r.success ? null : r.error.flatten().fieldErrors.password?.[0] ?? null);
+      setPasswordErr(
+        r.success
+          ? null
+          : r.error.flatten().fieldErrors.password?.[0] ?? null
+      );
     }
   };
 
@@ -62,10 +70,12 @@ export default function Signup() {
 
     setSubmitting(true);
     try {
-      const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
-        email,
-        password,
-      });
+      const { data: signUpData, error: signUpError } =
+        await supabase.auth.signUp({
+          email,
+          password,
+        });
+
       if (signUpError) {
         const appErr = normalizeError(signUpError);
         showError(appErr, {
@@ -78,7 +88,7 @@ export default function Signup() {
 
       if (signUpData?.session && signUpData.user) {
         setUser({ id: signUpData.user.id, email: signUpData.user.email });
-        navigate("/");
+        navigate("/today");
         return;
       }
 
@@ -94,16 +104,20 @@ export default function Signup() {
         setError(signInError.message);
         return;
       }
+
       if (signInData?.user) {
         setUser({ id: signInData.user.id, email: signInData.user.email });
-        navigate("/");
+        navigate("/today");
         return;
       }
 
       setError("サインアップは成功しましたが、ログインできませんでした。");
-      showError(new Error("サインアップは成功しましたが、ログインできませんでした。"), {
-        title: "ログインできませんでした",
-      });
+      showError(
+        new Error("サインアップは成功しましたが、ログインできませんでした。"),
+        {
+          title: "ログインできませんでした",
+        }
+      );
     } catch (e: any) {
       const appErr = normalizeError(e);
       showError(appErr, {
@@ -117,68 +131,66 @@ export default function Signup() {
   }
 
   return (
-    <div className="authPage">
-      <div className="authContainer">
-        <Title order={2} ta="center" fw={700} mb={28}>
+    <div className={s.loginPage}>
+      <div className={s.container}>
+        <Title order={2} className={s.title}>
           新規登録
         </Title>
-        <Title order={5} ta="center" c="dimmed" fw={600} mb={20}>
-          メールアドレスで登録
-        </Title>
 
+        {/* ログインには無いけど、エラーアラートはそのまま残してOK */}
         {error && (
-          <Alert color="red" className="errorAlert">
+          <Alert color="red" className={s.errorAlert}>
             {error}
           </Alert>
         )}
 
-        <form onSubmit={handleSubmit} className="form">
-          {/* メール */}
-          <div className="field">
-            <input
-              type="email"
-              name="email"
-              placeholder="メールアドレス"
-              autoComplete="email"
-              aria-label="メールアドレス"
-              value={email}
-              onChange={onChangeEmail}
-              required
-              className="input"
-            />
-          </div>
-          {emailErr && <div className="fieldError">{emailErr}</div>}
+<form onSubmit={handleSubmit} className={s.form} noValidate>
+  {/* メール */}
+  <div className={s.field}>
+    <input
+      type="email"
+      name="email"
+      placeholder="メールアドレス"
+      autoComplete="email"
+      aria-label="メールアドレス"
+      value={email}
+      onChange={onChangeEmail}
+      required
+      className={s.input}
+    />
+    {emailErr && <div className={s.fieldError}>{emailErr}</div>}
+  </div>
 
-          {/* パスワード */}
-          <div className="field">
-            <input
-              type="password"
-              name="password"
-              placeholder="パスワード"
-              autoComplete="new-password"
-              aria-label="パスワード"
-              value={password}
-              onChange={onChangePassword}
-              required
-              className="input"
-            />
-          </div>
-          {passwordErr && <div className="fieldError">{passwordErr}</div>}
+  {/* パスワード */}
+  <div className={s.field}>
+    <input
+      type="password"
+      name="password"
+      placeholder="パスワード"
+      autoComplete="new-password"
+      aria-label="パスワード"
+      value={password}
+      onChange={onChangePassword}
+      required
+      className={s.input}
+    />
+    {passwordErr && <div className={s.fieldError}>{passwordErr}</div>}
+  </div>
 
-          {/* 送信ボタン */}
-          <button
-            type="submit"
-            disabled={submitting}
-            className={`submitBtn${submitting ? " isSubmitting" : ""}`}
-            aria-disabled={submitting}
-          >
-            <span className="submitLabel">新規登録</span>
-          </button>
-        </form>
+  {/* 送信ボタン */}
+  <button
+    type="submit"
+    disabled={submitting}
+    className={s.linkBtn}
+    aria-disabled={submitting}
+  >
+    <span className={s.linkLabel}>新規登録</span>
+  </button>
+</form>
 
-        <div className="linkWrap">
-          <Link to="/login" className="linkBtn">
-            <span className="linkLabel">ログインへ</span>
+        <div className={s.linkWrap}>
+          <Link to="/login" className={s.linkBtn}>
+            <span className={s.linkLabel}>ログインへ</span>
           </Link>
         </div>
       </div>

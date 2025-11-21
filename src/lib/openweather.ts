@@ -1,26 +1,42 @@
-// src/lib/openweather.ts
+import { AppError } from '@/lib/appError';
+
 const API = 'https://api.openweathermap.org/data/2.5';
 const KEY = import.meta.env.VITE_OPENWEATHER_KEY as string;
+
 
 export async function fetchCurrentByCoords(lat: number, lon: number) {
   const url = `${API}/weather?lat=${lat}&lon=${lon}&appid=${KEY}&units=metric&lang=ja`;
   const res = await fetch(url);
-  if (!res.ok) throw new Error(await res.text());
+  if (!res.ok) {
+    // ★ サーバー側エラー扱いにする
+    throw new AppError(
+      "API_FAIL",
+      `現在の天気の取得に失敗しました（status: ${res.status}）`
+    );
+  }
   return res.json();
 }
 
-// 3時間刻み予報から、今日分の最大POPをざっくり計算
 export async function fetchTodayMaxPop(lat: number, lon: number) {
   const url = `${API}/forecast?lat=${lat}&lon=${lon}&appid=${KEY}&units=metric&lang=ja`;
   const res = await fetch(url);
-  if (!res.ok) throw new Error(await res.text());
+
+  if (!res.ok) {
+    throw new AppError(
+      "API_FAIL",
+      `降水確率データの取得に失敗しました（status: ${res.status}）`
+    );
+  }
+
   const json = await res.json();
+  // 以下はそのまま
   const today = new Date().getDate();
   const pops: number[] = json.list
     .filter((it: any) => new Date(it.dt * 1000).getDate() === today)
     .map((it: any) => it.pop ?? 0);
   return pops.length ? Math.max(...pops) : undefined;
 }
+
 
 // /forecast（無料）から日ごとに集計して 5〜6 日分の簡易デイリーを作る
 export async function fetchDailyFromForecast(lat: number, lon: number) {
@@ -29,7 +45,14 @@ export async function fetchDailyFromForecast(lat: number, lon: number) {
     `&appid=${KEY}&units=metric&lang=ja`;
 
   const res = await fetch(url);
-  if (!res.ok) throw new Error(await res.text());
+
+  if (!res.ok) {
+    throw new AppError(
+      "API_FAIL",
+      `週間予報の取得に失敗しました（status: ${res.status}）`
+    );
+  }
+
   const json = await res.json();
 
   type Bucket = {

@@ -1,6 +1,6 @@
 // src/pages/Calendar/CalendarTodo.tsx
 import React from "react";
-import TodoModal from "@/components/modal/TodoModal";
+import TodoModal from "@/components/modal/ToDoModal/TodoModal";
 import { z } from "zod";
 import { supabase } from "@/lib/supabase";
 import { useError } from "@/contexts/ErrorContext";
@@ -320,7 +320,6 @@ export default function CalendarTodo() {
 
       <TodoModal
         open={modalOpen}
-        dateText={modalDate ? ymd(modalDate) : ""}
         initialText={modalInitial}
         showDelete={modalShowDelete}
         onDelete={handleDeleteModal}

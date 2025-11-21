@@ -1,5 +1,5 @@
 // src/pages/Weekly.tsx
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { fetchDailyFromForecast } from "@/lib/openweather";
 import HeaderBar from "@/components/layout/HeaderBar/HeaderBar";
 import { useCity } from "@/store/city";
@@ -43,50 +43,60 @@ export default function Weekly() {
   const [days, setDays] = useState<Day[] | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  // ★ Zustand から現在の都市を取得
+  // Zustand から現在の都市を取得
   const { city } = useCity();
 
-  useEffect(() => {
+  const lat = city?.lat;
+  const lon = city?.lon;
+
+  // ★ 週間天気の再取得関数（メニューの「再取得」からも使う）
+  const refetchWeather = useCallback(async () => {
     // city がまだ読めていない場合の保護
-    if (!city || typeof city.lat !== "number" || typeof city.lon !== "number") {
+    if (typeof lat !== "number" || typeof lon !== "number") {
       return;
     }
 
     setDays(null);
     setError(null);
 
-    (async () => {
-      try {
-        const daily = await fetchDailyFromForecast(city.lat, city.lon);
-        setDays(daily as Day[]);
-      } catch (e: any) {
-        setError(e?.message ?? String(e));
-      }
-    })();
-  }, [city.lat, city.lon]); // ★ 都市が変わるたびに再取得
+    try {
+      const daily = await fetchDailyFromForecast(lat, lon);
+      setDays(daily as Day[]);
+    } catch (e: any) {
+      setError(e?.message ?? String(e));
+    }
+  }, [lat, lon]);
 
-  // ローディング・エラー時も HeaderBar は出したいならこうする
+  // 初回 & 都市変更時に自動取得
+  useEffect(() => {
+    refetchWeather();
+  }, [refetchWeather]);
+
+  // ローディング中
   if (!days && !error) {
     return (
       <div className={s.weeklyPage}>
-        <HeaderBar />
+        {/* ★ ローディング中でも再取得ボタンは出したいので渡す */}
+        <HeaderBar onRefetchWeather={refetchWeather} />
         <div className={s.loading}>読み込み中…</div>
       </div>
     );
   }
 
+  // エラー時
   if (error) {
     return (
       <div className={s.weeklyPage}>
-        <HeaderBar />
+        <HeaderBar onRefetchWeather={refetchWeather} />
         <div className={s.error}>{error}</div>
       </div>
     );
   }
 
+  // 正常時
   return (
     <div className={s.weeklyPage}>
-      <HeaderBar />
+      <HeaderBar onRefetchWeather={refetchWeather} />
       <h1 className={s.title}>週間予報</h1>
       <div className={s.wrap}>
         <div className={s.grid}>

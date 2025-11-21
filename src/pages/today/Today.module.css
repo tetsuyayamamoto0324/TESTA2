@@ -8,7 +8,7 @@ body {
 }
 
 .outfitInner {
-  padding-top: 80px;
+  padding-top: 60px;
   width: 50%;
   display: grid;
   justify-content: center;
@@ -17,7 +17,7 @@ body {
 .luckyInner {
   width: 50%;
   display: grid;
-  padding: 80px 30px 40px 30px;
+  padding: 60px 30px 40px 30px;
   justify-content: center;
   border-left: 1px solid rgba(0,0,0,.12);
 }

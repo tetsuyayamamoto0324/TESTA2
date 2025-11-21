@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import Modal from "@/components/modal/menumodal/Modal";
 import { useAuth } from "@/store/auth";
 import { triggerRefetch } from "@/lib/refetchBus";
-import { useCity } from "@/store/city"; // ★ 追加
+import { useCity } from "@/store/city";
 import s from "./HeaderBar.module.css";
 
 type Props = {
@@ -11,7 +11,7 @@ type Props = {
   city?: string;
   onMenuClick?: () => void;
   onCityClick?: () => void;
-  onRefetchWeather?: () => Promise<void> | void;
+  onRefetchWeather?: () => Promise<void> | void; // Today / Weekly だけ渡す
 };
 
 const jpWeek = ["日", "月", "火", "水", "木", "金", "土"];
@@ -24,32 +24,22 @@ export default function HeaderBar({
 }: Props) {
   const { user, signOut } = useAuth();
 
-  // src/components/HeaderBar/HeaderBar.tsx などに追加
+  function toJapanesePrefName(city: { state?: string; name: string }): string {
+    const baseEn = city.state ?? city.name;
+    const plain = baseEn.replace(/ Prefecture$/, "");
+    if (plain === "Tokyo") return "東京都";
+    if (plain === "Hokkaido") return "北海道";
+    if (plain === "Osaka") return "大阪府";
+    if (plain === "Kyoto") return "京都府";
+    return `${plain}県`;
+  }
 
-function toJapanesePrefName(city: { state?: string; name: string }): string {
-  // OpenWeather の state は "Osaka Prefecture" などなので、
-  // " Prefecture" を消して素の名前だけにする
-  const baseEn = city.state ?? city.name; // Kyoto / Osaka Prefecture / Tokyo ...
-  const plain = baseEn.replace(/ Prefecture$/, "");
+  const { city: currentCity } = useCity();
 
-  // 特別扱い（都・道・府）
-  if (plain === "Tokyo") return "東京都";
-  if (plain === "Hokkaido") return "北海道";
-  if (plain === "Osaka") return "大阪府";
-  if (plain === "Kyoto") return "京都府";
+  const storeCityLabel = React.useMemo(() => {
+    return currentCity?.name ?? "";
+  }, [currentCity]);
 
-  // それ以外は 〇〇県 として扱う
-  return `${plain}県`;
-}
-
-const { city: currentCity } = useCity();
-
-const storeCityLabel = React.useMemo(() => {
-  return currentCity?.name ?? "";
-}, [currentCity]);
-
-  // ★ 既存の city props があればそちらを優先し、
-  //    なければ store の都市名、それもなければデフォルト「東京都」
   const cityLabel =
     city && city.trim()
       ? city.trim()
@@ -91,6 +81,10 @@ const storeCityLabel = React.useMemo(() => {
     }
   };
 
+  // ★ Today / Weekly だけ再取得ボタンを出したいので、
+  //    「onRefetchWeather が渡されているか」で判断する。
+  const showReloadButton = Boolean(onRefetchWeather);
+
   return (
     <>
       <header className={s.header}>
@@ -113,6 +107,18 @@ const storeCityLabel = React.useMemo(() => {
           </button>
         </div>
       </header>
+
+      {/* ★ 中身は MenuModal 側に任せる */}
+      <Modal
+        open={menuOpen}
+        onClose={() => setMenuOpen(false)}
+        email={user?.email}
+        showReloadButton={showReloadButton}
+        refetching={refetching}
+        refetchMsg={refetchMsg}
+        onClickReload={handleRefetchClick}
+        onClickLogout={handleLogout}
+      />
     </>
   );
 }

@@ -1,8 +1,8 @@
 // src/contexts/ErrorContext.tsx
 // src/contexts/ErrorContext.tsx
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
-import ErrorModal from "@/components/modal/ErrorModal";
-import NetworkErrorModal from "@/components/modal/NetworkErrorModal";
+import ErrorModal from "@/components/modal/ErrorModal/ErrorModal";
+import NetworkErrorModal from "@/components/modal/NetworkErrorModal/NetworkErrorModal";
 import { AppErrorKind, normalizeError, messageFor } from "@/lib/appError";
 
 

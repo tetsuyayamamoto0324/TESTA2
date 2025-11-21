@@ -16,31 +16,48 @@
     display: flex;
     justify-content: flex-end;
 }
-.close {
-    cursor: pointer;
-}
-.close:hover {
-    opacity: 0.7;
-}
 .body {
     text-align: center;
+    line-height: 50px;
+    padding: 0 30px;
 }
 .userLabel {
-  margin-top: 4px;
+  font-size: 20px;
   font-weight: 600;
 }
 
 /* メアド */
-.email {
-  margin-top: 8px;
+.emailText {
+  font-size: 20px;
+}
+.refetchRow {
+  display: flex;
+  flex-direction: column;
+}
+.refetchBtn {
+  margin-top: 50px;
+  padding: 8px 0px;
+  font-size: 16px;
+  border-radius: 4px;
+}
+.note {
+  margin-top: 10px;
+  font-size: 16px;
+}
+.logoutRow {
+  margin-top: 20px;      /* 上との余白はお好みで */
+  text-align: center;    /* 真ん中に置きたい場合 */
 }
 
-/* 再取得ボタン */
-.reloadButton {
-  margin-top: 12px;
-  padding: 4px 12px;
-  border-radius: 4px;
-  border: 1px solid #999;
-  background: #fff;
-  cursor: pointer;
+.logoutBtn {
+  border: none;          /* ボタン枠なし */
+  background: none;      /* 背景色なし */
+  padding: 0;            /* 余白なし → テキストだけの見た目に */
+  margin: 0;
+
+  color: #e11d48;        /* ★ 赤文字 */
+  font-size: 16px;       /* お好みで */
+}
+.hr {
+  border: none;
 }

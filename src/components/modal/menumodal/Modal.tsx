@@ -1,25 +1,27 @@
-// src/components/Modal.tsx
+// src/components/modal/menumodal/Modal.tsx
 import React, { useEffect, useRef } from "react";
 import s from "./Modal.module.css";
 
 type Props = {
   open: boolean;
   onClose: () => void;
-  userName: string;
-  email: string;
-  showReloadButton?: boolean;   // ★ 再取得ボタンを出すかどうか
-  onReload?: () => void;        // ★ 再取得クリック時（Today/Weeklyだけ使う）
-  onLogout?: () => void;        // ログアウトクリック時
+  email?: string | null;
+  showReloadButton?: boolean;      // Today / Weekly だけ true
+  refetching?: boolean;
+  refetchMsg?: string;
+  onClickReload?: () => void;
+  onClickLogout?: () => void;
 };
 
-export default function Modal({
+export default function MenuModal({
   open,
   onClose,
-  userName,
   email,
   showReloadButton = false,
-  onReload,
-  onLogout,
+  refetching = false,
+  refetchMsg = "",
+  onClickReload,
+  onClickLogout,
 }: Props) {
   const firstFocusRef = useRef<HTMLDivElement>(null);
 
@@ -70,31 +72,41 @@ export default function Modal({
           </button>
         </div>
 
-        {/* ★ ここが中身。メール＋再取得ボタンも含めて全部書く */}
+        {/* 中身 */}
         <div className={s.body}>
           <div className={s.userLabel}>ログイン中ユーザー</div>
 
-          <div className={s.email}>
-            <a href={`mailto:${email}`}>{email}</a>
+          <div className={s.emailRow}>
+            <span className={s.emailText}>
+              {email ?? "（未ログイン）"}
+            </span>
           </div>
 
           {showReloadButton && (
-            <button
-              type="button"
-              className={s.reloadButton}
-              onClick={onReload}
-            >
-              再取得
-            </button>
+            <div className={s.refetchRow}>
+              <button
+                type="button"
+                onClick={onClickReload}
+                disabled={refetching}
+                className={s.refetchBtn}
+              >
+                {refetching ? "再取得中…" : "再取得"}
+              </button>
+              {refetchMsg && <span className={s.note}>{refetchMsg}</span>}
+            </div>
           )}
 
-          <button
-            type="button"
-            className={s.logoutButton}
-            onClick={onLogout}
-          >
-            ログアウト
-          </button>
+          <hr className={s.hr} />
+
+          <div className={s.logoutRow}>
+            <button
+              type="button"
+              className={s.logoutBtn}
+              onClick={onClickLogout}
+            >
+              ログアウト
+            </button>
+          </div>
         </div>
       </div>
     </div>

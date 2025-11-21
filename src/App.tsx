@@ -6,10 +6,10 @@ import { MantineProvider, AppShell } from "@mantine/core";
 import { useAuth } from "./store/auth";
 import ProtectedRoute from "./components/layout/ProtectedRoute";
 import ProtectedLayout from "./components/layout/ProtectedLayout";
-import AuthGate from "./components/modal/AuthGate";
+import AuthGate from "./components/modal/NetworkErrorModal/AuthGate";
 
-import Login from "./pages/Auth/Login";
-import Signup from "./pages/Auth/Signup";
+import Login from "./pages/Auth/Login/Login";
+import Signup from "./pages/Auth/Signup/Signup";
 import Today from "./pages/today/Today";
 import Weekly from "./pages/Weekly/Weekly";
 import CalendarTodo from "./pages/Todo/CalendarTodo";
