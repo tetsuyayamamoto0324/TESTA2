@@ -11,7 +11,7 @@ import { jstYmd } from "@/lib/date-jst";
 import { useError } from "@/contexts/ErrorContext";
 import { validateResponseOrShow } from "@/lib/validate";
 import s from "./Today.module.css";
-
+// これは 画面用の状態（state）の形 を TypeScript で定義しています。
 type State = {
   name?: string;
   temp?: number;
@@ -21,7 +21,7 @@ type State = {
   loading: boolean;
   error?: string;
 };
-
+// SavedCity は localStorage に保存されている都市情報の形 です。
 type SavedCity = {
   name: string;
   state?: string;
@@ -30,7 +30,7 @@ type SavedCity = {
   lon: number;
 } | null;
 
-// OpenWeather 受信スキーマ（最小限）
+// OpenWeather の「現在の天気」レスポンスのうち、必要な最小限だけを Zod で定義しています。
 const CurrentSchema = z.object({
   name: z.string().optional(),
   main: z.object({ temp: z.number().nullable().optional() }).optional(),
@@ -43,13 +43,16 @@ const CurrentSchema = z.object({
     )
     .optional(),
 });
+// 「降水確率」の最大値を 0〜1 の数値 or null or undefined として許可するスキーマ。
 const MaxPopSchema = z.number().min(0).max(1).nullable().optional();
-
+// 初期状態は「読み込み中」。
+// エラー表示専用の機能も準備しておく。
 export default function Today() {
   const [state, setState] = useState<State>({ loading: true });
   const showError = useError();
 
-  // localStorage から都市設定（なければ東京都）
+//   前に選んだ都市があればそれを使う。
+// なければ 緯度/経度が東京になる。
   const saved: SavedCity = useMemo(() => {
     try {
       return JSON.parse(localStorage.getItem("default-city-v1") || "null");
@@ -62,14 +65,17 @@ export default function Today() {
   const lon = saved?.lon ?? 139.6917;
   const cityName = saved?.name ?? "東京都";
 
-  // 天気再取得（HeaderBarからも呼べる）
+// 天気と降水確率を同時取得し、
+// 形式チェックしてから state に入れる。
+// 失敗したらエラーメッセージを表示。
   const refetchWeather = useCallback(async () => {
     try {
+      // 2つの API を同時に取得
       const [curRaw, popRaw] = await Promise.all([
         fetchCurrentByCoords(lat, lon),
         fetchTodayMaxPop(lat, lon),
       ]);
-
+ // スキーマでチェック
       const curChk = validateResponseOrShow({
         schema: CurrentSchema,
         data: curRaw,
@@ -96,7 +102,7 @@ export default function Today() {
 
       const cur = curChk.data;
       const pop = popChk.data;
-
+// 正常に取れたら state 更新
       setState({
         name: cur.name || cityName,
         temp: cur.main?.temp ?? undefined,
@@ -112,7 +118,7 @@ export default function Today() {
     }
   }, [lat, lon, cityName, showError]);
 
-  // 初回ロード
+  //Today 画面を開いた瞬間に天気を取りに行く。
   useEffect(() => {
     (async () => {
       try {
@@ -123,7 +129,8 @@ export default function Today() {
       }
     })();
   }, [refetchWeather, showError]);
-
+// データが来る前は中身を見せず、
+// 状態に応じて UI を切り替える。
   if (state.loading) return <div className={s.loading}>読み込み中…</div>;
   if (state.error) return <div className={s.error}>{state.error}</div>;
 
