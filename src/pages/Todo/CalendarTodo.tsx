@@ -10,29 +10,36 @@ import HeaderBar from "@/components/layout/HeaderBar/HeaderBar";
 
 const REMOTE_TODO_ENABLED = import.meta.env.VITE_TODO_REMOTE === "1";
 const ERROR_MODAL_ENABLED = import.meta.env.VITE_TODO_ERROR_MODAL === "1";
-
+// Supabase の URL とキーがちゃんと設定されているかを確認する関数。
+// 設定がなければ「リモート保存はやらない」という安全策。
 function isSupabaseReady() {
   const url = import.meta.env.VITE_SUPABASE_URL;
   const key = import.meta.env.VITE_SUPABASE_ANON_KEY;
   return Boolean(url && key && supabase?.from);
 }
-
+// 文字列が長すぎるときに、
+// max 文字で切って「…」をつける関数。
+// カレンダーの1マスが長文で崩れないようにする。
 const clip = (text: string, max: number) => {
   const arr = Array.from(text);
   return arr.length <= max ? text : arr.slice(0, max).join("") + "…";
 };
-
+// LS_KEY … localStorage で ToDo を保存するためのキー名。
 const LS_KEY = "todo-cal-v1";
 const LONG_LINE_MAX = 10;
 const ITEM_LINE_MAX = 10;
-
+// Date オブジェクトを "2025-11-24" みたいな文字列にする関数。
+// ローカル保存や Supabase 保存で「日付のキー」として使う。
 const ymd = (d: Date) =>
   `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(
     d.getDate()
   ).padStart(2, "0")}`;
 
 type TodoMap = Record<string, string[]>;
+// → localStorage から ToDo マップを読み込む。エラー時は空オブジェクト {}。
 
+// saveTodos
+// → ToDo マップを localStorage に保存。
 function loadTodos(): TodoMap {
   try {
     const raw = localStorage.getItem(LS_KEY);
@@ -44,7 +51,7 @@ function loadTodos(): TodoMap {
 function saveTodos(v: TodoMap) {
   localStorage.setItem(LS_KEY, JSON.stringify(v));
 }
-
+// 「カレンダー表示用に42マス（6週間 × 7日）分の Date を作る」関数。
 function buildMonthMatrix(viewYear: number, viewMonth: number) {
   const first = new Date(viewYear, viewMonth, 1);
   const firstDow = first.getDay();
@@ -57,7 +64,7 @@ function buildMonthMatrix(viewYear: number, viewMonth: number) {
   }
   return cells;
 }
-
+// Row … Supabase の todos テーブルから返ってくる行の型（date と text）。
 type Row = { date: string; text: string };
 
 function monthRange(y: number, m0: number) {
@@ -69,7 +76,7 @@ function monthRange(y: number, m0: number) {
     ).padStart(2, "0")}`;
   return { from: iso(from), to: iso(to) };
 }
-
+// 「カレンダー画面の“今の状態”を全部用意しているところ」
 export default function CalendarTodo() {
   const today = new Date();
   const [viewYear, setViewYear] = React.useState(today.getFullYear());
@@ -91,20 +98,21 @@ export default function CalendarTodo() {
     [viewYear, viewMonth]
   );
   const titleMonth = viewMonth + 1;
-
+// 「前月ボタンを押したときに、表示中の年・月を1ヶ月前に更新する関数」
   const prev = () => {
     const m = new Date(viewYear, viewMonth - 1, 1);
     setViewYear(m.getFullYear());
     setViewMonth(m.getMonth());
   };
+  // 「次月ボタンを押したときに、表示中の年・月を1ヶ月先に更新する関数」
   const next = () => {
     const m = new Date(viewYear, viewMonth + 1, 1);
     setViewYear(m.getFullYear());
     setViewMonth(m.getMonth());
   };
-
+// Date を "2025-11-24" のような文字列に変換する関数
   const keyFromDate = (d: Date) => ymd(d);
-
+// カレンダーのある日をクリックしたときに、その日の ToDo をモーダルに読み込んで、編集できるように開くための関数
   const editDay = (d: Date) => {
     const key = keyFromDate(d);
     const cur = todos[key] ?? [];
@@ -113,9 +121,13 @@ export default function CalendarTodo() {
     setModalShowDelete(cur.length > 0);
     setModalOpen(true);
   };
-
+// 「reportError を安定させる（毎回作り直さない）ために useCallback を使っている」
   const reportError = React.useCallback(
+    // 「エラー（e）と、必要なら再試行用の関数（retry）を受け取る関数」
     (e: unknown, retry?: () => void) => {
+//       画面に「サーバーエラーが発生しました（WLP-SRV-501）」というタイトル
+// 「時間をおいて再度お試しください」という説明
+// 場合によっては「再試行」ボタン（→ retry が呼ばれる）
       if (ERROR_MODAL_ENABLED) {
         showError(e, {
           title: "サーバーエラーが発生しました（WLP-SRV-501）",
