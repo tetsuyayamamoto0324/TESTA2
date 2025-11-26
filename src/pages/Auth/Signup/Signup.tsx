@@ -8,7 +8,7 @@ import { useAuth } from "../../../store/auth";
 import { useError } from "@/contexts/ErrorContext";
 import { normalizeError, messageFor } from "@/lib/appError";
 import s from "./Signup.module.css";
-
+// 値の型＋バリデーションルールを決めている
 const schema = z.object({
   email: z.string().min(1, "メールは必須です").email("メール形式が不正です"),
   password: z.string().min(6, "6文字以上で入力してください"),
@@ -18,23 +18,36 @@ export default function Signup() {
   const navigate = useNavigate();
   const { setUser } = useAuth();
   const showError = useError();
+  //   最初は空で、
+// ユーザーの入力などで値が変わったときに
+// setEmail / setPassword を使って状態を更新する
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+//   最初は「エラーなし」を意味する null
+// エラーが出たら「エラーメッセージ文字列」を入れる
   const [emailErr, setEmailErr] = useState<string | null>(null);
   const [passwordErr, setPasswordErr] = useState<string | null>(null);
+  // このフォームが一度でも送信ボタンを押されたことがあるかどうかを覚えておくフラグ
+  // 送信ボタンを押すまではエラーを出さない
   const [submittedOnce, setSubmittedOnce] = useState(false);
+//   submitting は
+// 「送信処理がいま進行中かどうか」を管理するための state
+// 初期値は false、処理開始時に true にして、終わったら false に戻す
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-// 「メール入力欄の値が変わった時に
-// ① email state を更新して
-// ②（もし一度でも送信されていたら）その場でメールのバリデーションをして、
-// エラーメッセージを emailErr に入れる」
+// (e: React.ChangeEvent<HTMLInputElement>) は
+// 「それは <input> 用の change イベントだよ」と TypeScript に教えている
   const onChangeEmail = (e: React.ChangeEvent<HTMLInputElement>) => {
+    // ここで入力した文字が setEmailに保持される
     const v = e.target.value;
     setEmail(v);
+    // 一度でも送信された場合、
     if (submittedOnce) {
+      // 「メール専用スキーマを作り、{ email: v }をチェックして結果をrにいれる
       const r = schema.pick({ email: true }).safeParse({ email: v });
+      // エラーを表示
       setEmailErr(
+        // 成功＝ｒ　失敗＝zodからメッセージをとりだしてエラー表示
         r.success ? null : r.error.flatten().fieldErrors.email?.[0] ?? null
       );
     }
@@ -59,7 +72,9 @@ export default function Signup() {
 // このあと API 呼び出しなど、本当のサインアップ処理を続けます。」
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    // 一度でも送信された
     setSubmittedOnce(true);
+    // エラーを消す
     setError(null);
 // 「もしバリデーションに失敗していたら、
 // 各フィールドにエラーをセットして、

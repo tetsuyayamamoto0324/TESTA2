@@ -10,7 +10,7 @@ import { useError } from "@/contexts/ErrorContext";
 import { normalizeError } from "@/lib/appError";
 import s from "./Login.module.css";
 
-//ログインフォームの入力値の型とルールをまとめて定義しています。
+//ログインフォームの入力値の型とルールをまとめて定義
 const schema = z.object({
 //xxx@yyy.zz のようなメール形式かチェック。
   email: z.string().min(1, "メールは必須です").email("メール形式が不正です"),
@@ -63,7 +63,7 @@ export default function Login() {
   const onSubmit = form.onSubmit(async (values) => {
     //「これからログイン処理を始めるので、送信中フラグを ON にしている」
     setSubmitting(true);
-//予期せぬエラーが出たときに落ちないように try で囲んでいます。
+//予期せぬエラーが出たときに落ちないように try で囲む
     try {
       //Supabase の 認証API を呼んでからメールアドレス + パスワードでログインしようとしています。
       // 「Supabase にメール+パスワードでログインを試みて、その結果から data と error を取り出している」

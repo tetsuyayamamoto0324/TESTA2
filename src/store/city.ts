@@ -38,8 +38,9 @@ type CityState = {
   setCity: (c: City) => void;
   resetToTokyo: () => void;
 };
-
+// useCity関数に Zustand にあるcreate関数を呼んで型は自分が定義したCityState型を使う
 export const useCity = create<CityState>((set) => ({
+  // 「useCity ストアの中に、city という状態を用意して、その初期値を loadFromLS() にしている部分」
   city: loadFromLS(),
   setCity: (c) => {
     localStorage.setItem(LS_KEY, JSON.stringify(c));

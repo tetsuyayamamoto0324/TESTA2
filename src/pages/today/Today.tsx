@@ -43,6 +43,8 @@ const CurrentSchema = z.object({
     )
     .optional(),
 });
+
+
 // 「降水確率」の最大値を 0〜1 の数値 or null or undefined として許可するスキーマ。
 const MaxPopSchema = z.number().min(0).max(1).nullable().optional();
 // 初期状態は「読み込み中」。
@@ -102,7 +104,7 @@ export default function Today() {
 
       const cur = curChk.data;
       const pop = popChk.data;
-// 正常に取れたら state 更新
+//Zod でチェックして、OKなら「画面用の天気データ」を state に保存
       setState({
         name: cur.name || cityName,
         temp: cur.main?.temp ?? undefined,

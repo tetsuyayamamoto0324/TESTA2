@@ -43,7 +43,7 @@ export default function LuckyItem() {
   const seed = jstYmd(new Date());
 
   const idx = ITEMS.length ? hash32(seed) % ITEMS.length : 0;
-  const chosen = ITEMS[idx] ?? { label: "—", emoji: "—" };
+  const chosen = ITEMS[idx] ?? { label: "星", emoji: "☆" };
   const { label, imgSrc, emoji } = chosen;
 
   return (

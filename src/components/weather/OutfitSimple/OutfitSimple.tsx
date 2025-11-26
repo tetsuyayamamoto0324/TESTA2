@@ -11,6 +11,7 @@ type Props = {
 
 function clothingByTemp(t?: number | null) {
   if (typeof t !== "number") return { label: "—", key: "none" as const };
+  // Math.round(t) で四捨五入した整数にする
   const x = Math.round(t);
   if (x <= 10) return { label: "コート", key: "coat" as const };
   if (x <= 19) return { label: "長袖", key: "long" as const };
